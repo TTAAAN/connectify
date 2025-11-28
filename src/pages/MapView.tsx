@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Button } from '../components/ui/button';
@@ -10,18 +10,55 @@ import {
   MapPin, Search, Layers, Locate, X,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom colored markers
+const createColoredIcon = (color: string) => {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+};
+
+function LocateControl() {
+  const map = useMap();
+  
+  const handleLocate = () => {
+    map.locate({ setView: true, maxZoom: 12 });
+  };
+  
+  return (
+    <div className="absolute bottom-24 right-4 z-[1000]">
+      <Button size="icon" className="bg-white text-gray-700 shadow-lg hover:bg-gray-50" onClick={handleLocate}>
+        <Locate className="h-5 w-5" />
+      </Button>
+    </div>
+  );
+}
 
 export function MapView() {
   const [showPanel, setShowPanel] = useState(true);
   const [selectedOpportunity, setSelectedOpportunity] = useState<string | null>(null);
 
   const categoryColors: Record<string, string> = {
-    'Volunteering': 'bg-sky-500',
-    'Workshops': 'bg-blue-500',
-    'Competitions': 'bg-indigo-500',
-    'Internships': 'bg-cyan-500',
-    'Jobs': 'bg-blue-600',
-    'Events': 'bg-blue-400'
+    'Volunteering': '#0ea5e9',
+    'Workshops': '#3b82f6',
+    'Competitions': '#6366f1',
+    'Internships': '#06b6d4',
+    'Jobs': '#2563eb',
+    'Events': '#60a5fa'
   };
 
   return (

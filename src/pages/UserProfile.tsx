@@ -121,43 +121,44 @@ export function UserProfile() {
               </TabsList>
 
               {/* Personal Info Tab */}
-              <TabsContent value="personal">
+              <TabsContent value="personal" className="mt-6">
                 <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl mb-6">Personal Information</h3>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" defaultValue="Jane" />
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-semibold mb-8">Personal Information</h3>
+                    <div className="grid grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
+                        <Input id="firstName" defaultValue="Jane" className="h-11" />
                       </div>
-                      <div>
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" defaultValue="Doe" />
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
+                        <Input id="lastName" defaultValue="Doe" className="h-11" />
                       </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" defaultValue="jane.doe@email.com" />
+                      <div className="col-span-2 space-y-2">
+                        <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+                        <Input id="email" type="email" defaultValue="jane.doe@email.com" className="h-11" />
                       </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" />
+                      <div className="col-span-2 space-y-2">
+                        <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                        <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" className="h-11" />
                       </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="location">Location</Label>
-                        <Input id="location" placeholder="City, State/Country" />
+                      <div className="col-span-2 space-y-2">
+                        <Label htmlFor="location" className="text-sm font-medium">Location</Label>
+                        <Input id="location" placeholder="City, State/Country" className="h-11" />
                       </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="bio">Bio</Label>
+                      <div className="col-span-2 space-y-2">
+                        <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
                         <Textarea 
                           id="bio" 
                           placeholder="Tell us about yourself..."
-                          rows={4}
+                          rows={5}
+                          className="resize-none"
                         />
                       </div>
                     </div>
-                    <div className="flex justify-end gap-3 mt-6">
-                      <Button variant="outline">Cancel</Button>
-                      <Button className="bg-blue-600 hover:bg-blue-700">
+                    <div className="flex justify-end gap-4 mt-10 pt-6 border-t">
+                      <Button variant="outline" className="px-6">Cancel</Button>
+                      <Button className="bg-blue-600 hover:bg-blue-700 px-6">
                         Save Changes
                       </Button>
                     </div>
@@ -166,19 +167,19 @@ export function UserProfile() {
               </TabsContent>
 
               {/* Preferences Tab */}
-              <TabsContent value="preferences">
+              <TabsContent value="preferences" className="mt-6">
                 <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl mb-6">Preferences & Interests</h3>
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-semibold mb-8">Preferences & Interests</h3>
                     
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                       <div>
-                        <Label className="text-base mb-3 block">Interested Categories</Label>
-                        <div className="grid grid-cols-3 gap-3">
+                        <Label className="text-base font-medium mb-4 block">Interested Categories</Label>
+                        <div className="grid grid-cols-3 gap-4">
                           {['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'].map((cat) => (
-                            <div key={cat} className="flex items-center gap-2">
+                            <div key={cat} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors">
                               <Switch id={cat} defaultChecked={cat === 'Workshops' || cat === 'Internships'} />
-                              <Label htmlFor={cat} className="cursor-pointer">{cat}</Label>
+                              <Label htmlFor={cat} className="cursor-pointer font-normal">{cat}</Label>
                             </div>
                           ))}
                         </div>
@@ -187,26 +188,26 @@ export function UserProfile() {
                       <Separator />
 
                       <div>
-                        <Label className="text-base mb-3 block">Notification Settings</Label>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
+                        <Label className="text-base font-medium mb-4 block">Notification Settings</Label>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-4 rounded-lg border">
                             <div>
                               <div className="font-medium">Email Notifications</div>
-                              <div className="text-sm text-gray-600">Receive updates about new opportunities</div>
+                              <div className="text-sm text-gray-600 mt-1">Receive updates about new opportunities</div>
                             </div>
                             <Switch defaultChecked />
                           </div>
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between p-4 rounded-lg border">
                             <div>
                               <div className="font-medium">Deadline Reminders</div>
-                              <div className="text-sm text-gray-600">Get notified 3 days before deadlines</div>
+                              <div className="text-sm text-gray-600 mt-1">Get notified 3 days before deadlines</div>
                             </div>
                             <Switch defaultChecked />
                           </div>
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between p-4 rounded-lg border">
                             <div>
                               <div className="font-medium">Weekly Digest</div>
-                              <div className="text-sm text-gray-600">Summary of new opportunities each week</div>
+                              <div className="text-sm text-gray-600 mt-1">Summary of new opportunities each week</div>
                             </div>
                             <Switch />
                           </div>
@@ -215,15 +216,15 @@ export function UserProfile() {
 
                       <Separator />
 
-                      <div>
-                        <Label htmlFor="preferredLocation">Preferred Location</Label>
-                        <Input id="preferredLocation" placeholder="e.g., San Francisco, CA" className="mt-2" />
+                      <div className="space-y-2">
+                        <Label htmlFor="preferredLocation" className="text-sm font-medium">Preferred Location</Label>
+                        <Input id="preferredLocation" placeholder="e.g., San Francisco, CA" className="h-11 max-w-md" />
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 mt-6">
-                      <Button variant="outline">Cancel</Button>
-                      <Button className="bg-blue-600 hover:bg-blue-700">
+                    <div className="flex justify-end gap-4 mt-10 pt-6 border-t">
+                      <Button variant="outline" className="px-6">Cancel</Button>
+                      <Button className="bg-blue-600 hover:bg-blue-700 px-6">
                         Save Preferences
                       </Button>
                     </div>
@@ -232,35 +233,35 @@ export function UserProfile() {
               </TabsContent>
 
               {/* Saved Opportunities Tab */}
-              <TabsContent value="saved">
+              <TabsContent value="saved" className="mt-6">
                 <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl mb-6">Saved Opportunities</h3>
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-semibold mb-8">Saved Opportunities</h3>
                     <div className="space-y-4">
                       {savedOpportunities.map((opportunity) => (
-                        <div key={opportunity.id} className="border rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-shadow">
+                        <div key={opportunity.id} className="border rounded-xl p-6 flex items-center justify-between hover:shadow-md transition-shadow bg-white">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h4 className="text-lg">{opportunity.title}</h4>
+                            <div className="flex items-center gap-3 mb-3">
+                              <h4 className="text-lg font-medium">{opportunity.title}</h4>
                               {opportunity.verified && (
-                                <CheckCircle className="h-4 w-4 text-green-500" />
+                                <CheckCircle className="h-5 w-5 text-green-500" />
                               )}
                             </div>
-                            <p className="text-gray-600 mb-2">{opportunity.organization}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
+                            <p className="text-gray-600 mb-3">{opportunity.organization}</p>
+                            <div className="flex items-center gap-6 text-sm text-gray-500">
+                              <span className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4" />
                                 {opportunity.location}
                               </span>
-                              <span className="flex items-center gap-1">
+                              <span className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4" />
                                 {new Date(opportunity.date).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline">Remove</Button>
-                            <Button className="bg-blue-600 hover:bg-blue-700">
+                          <div className="flex items-center gap-3 ml-6">
+                            <Button variant="outline" className="px-4">Remove</Button>
+                            <Button className="bg-blue-600 hover:bg-blue-700 px-4">
                               View Details
                             </Button>
                           </div>
@@ -272,10 +273,10 @@ export function UserProfile() {
               </TabsContent>
 
               {/* Applications Tab */}
-              <TabsContent value="applications">
+              <TabsContent value="applications" className="mt-6">
                 <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl mb-6">Application History</h3>
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-semibold mb-8">Application History</h3>
                     <div className="space-y-4">
                       {mockOpportunities.slice(0, 5).map((opportunity, index) => {
                         const statuses = ['Under Review', 'Accepted', 'Pending', 'Submitted', 'Waitlisted'];
@@ -289,16 +290,16 @@ export function UserProfile() {
                         };
 
                         return (
-                          <div key={opportunity.id} className="border rounded-lg p-4 flex items-center justify-between">
+                          <div key={opportunity.id} className="border rounded-xl p-6 flex items-center justify-between hover:shadow-md transition-shadow">
                             <div className="flex-1">
-                              <h4 className="text-lg mb-1">{opportunity.title}</h4>
-                              <p className="text-gray-600 text-sm mb-2">{opportunity.organization}</p>
-                              <div className="flex items-center gap-3">
+                              <h4 className="text-lg font-medium mb-2">{opportunity.title}</h4>
+                              <p className="text-gray-600 text-sm mb-3">{opportunity.organization}</p>
+                              <div className="flex items-center gap-4">
                                 <Badge className={statusColors[status]}>{status}</Badge>
                                 <span className="text-sm text-gray-500">Applied on Nov {10 + index}, 2025</span>
                               </div>
                             </div>
-                            <Button variant="outline">View Application</Button>
+                            <Button variant="outline" className="px-4">View Application</Button>
                           </div>
                         );
                       })}
@@ -308,34 +309,34 @@ export function UserProfile() {
               </TabsContent>
 
               {/* My Submissions Tab */}
-              <TabsContent value="submissions">
+              <TabsContent value="submissions" className="mt-6">
                 <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl mb-6">My Event Submissions</h3>
-                    <div className="space-y-4">
-                      <div className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-semibold mb-8">My Event Submissions</h3>
+                    <div className="space-y-6">
+                      <div className="border rounded-xl p-6 bg-blue-50/50">
+                        <div className="flex items-center justify-between mb-4">
                           <div className="flex-1">
-                            <h4 className="text-lg mb-1">Blockchain Development Conference</h4>
+                            <h4 className="text-lg font-medium mb-2">Blockchain Development Conference</h4>
                             <p className="text-gray-600 text-sm">Submitted on Nov 15, 2025</p>
                           </div>
-                          <Badge className="bg-blue-100 text-blue-700 gap-1">
+                          <Badge className="bg-blue-100 text-blue-700 gap-1 px-3 py-1">
                             <Clock className="h-3 w-3" />
                             Under Review
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 mb-3">
+                        <p className="text-sm text-gray-600 mb-4">
                           Your submission is currently being reviewed by our admin team. Typical review time is 24-48 hours.
                         </p>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">Edit Submission</Button>
-                          <Button variant="ghost" size="sm" className="text-red-600">Withdraw</Button>
+                        <div className="flex items-center gap-3">
+                          <Button variant="outline" size="sm" className="px-4">Edit Submission</Button>
+                          <Button variant="ghost" size="sm" className="text-red-600 px-4">Withdraw</Button>
                         </div>
                       </div>
 
-                      <div className="text-center py-8">
+                      <div className="text-center py-12 border-2 border-dashed rounded-xl">
                         <p className="text-gray-600 mb-4">Want to share an opportunity with the community?</p>
-                        <Button className="bg-blue-600 hover:bg-blue-700">
+                        <Button className="bg-blue-600 hover:bg-blue-700 px-6">
                           Submit New Event
                         </Button>
                       </div>
@@ -345,28 +346,28 @@ export function UserProfile() {
               </TabsContent>
 
               {/* Security Tab */}
-              <TabsContent value="security">
+              <TabsContent value="security" className="mt-6">
                 <Card>
-                  <CardContent className="pt-6">
-                    <h3 className="text-xl mb-6">Security Settings</h3>
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-semibold mb-8">Security Settings</h3>
                     
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                       <div>
-                        <h4 className="mb-4">Change Password</h4>
-                        <div className="space-y-4 max-w-md">
-                          <div>
-                            <Label htmlFor="currentPassword">Current Password</Label>
-                            <Input id="currentPassword" type="password" />
+                        <h4 className="text-lg font-medium mb-6">Change Password</h4>
+                        <div className="space-y-5 max-w-lg">
+                          <div className="space-y-2">
+                            <Label htmlFor="currentPassword" className="text-sm font-medium">Current Password</Label>
+                            <Input id="currentPassword" type="password" className="h-11" />
                           </div>
-                          <div>
-                            <Label htmlFor="newPassword">New Password</Label>
-                            <Input id="newPassword" type="password" />
+                          <div className="space-y-2">
+                            <Label htmlFor="newPassword" className="text-sm font-medium">New Password</Label>
+                            <Input id="newPassword" type="password" className="h-11" />
                           </div>
-                          <div>
-                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                            <Input id="confirmPassword" type="password" />
+                          <div className="space-y-2">
+                            <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm New Password</Label>
+                            <Input id="confirmPassword" type="password" className="h-11" />
                           </div>
-                          <Button className="bg-blue-600 hover:bg-blue-700">
+                          <Button className="bg-blue-600 hover:bg-blue-700 px-6 mt-2">
                             Update Password
                           </Button>
                         </div>
@@ -375,11 +376,11 @@ export function UserProfile() {
                       <Separator />
 
                       <div>
-                        <h4 className="mb-4">Two-Factor Authentication</h4>
-                        <div className="flex items-center justify-between max-w-md">
+                        <h4 className="text-lg font-medium mb-6">Two-Factor Authentication</h4>
+                        <div className="flex items-center justify-between max-w-lg p-4 rounded-lg border">
                           <div>
                             <div className="font-medium">Enable 2FA</div>
-                            <div className="text-sm text-gray-600">Add an extra layer of security to your account</div>
+                            <div className="text-sm text-gray-600 mt-1">Add an extra layer of security to your account</div>
                           </div>
                           <Switch />
                         </div>
@@ -388,15 +389,15 @@ export function UserProfile() {
                       <Separator />
 
                       <div>
-                        <h4 className="mb-4">Connected Accounts</h4>
-                        <div className="space-y-3 max-w-md">
-                          <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <span>Google</span>
-                            <Button variant="outline" size="sm">Connect</Button>
+                        <h4 className="text-lg font-medium mb-6">Connected Accounts</h4>
+                        <div className="space-y-4 max-w-lg">
+                          <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <span className="font-medium">Google</span>
+                            <Button variant="outline" size="sm" className="px-4">Connect</Button>
                           </div>
-                          <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <span>LinkedIn</span>
-                            <Button variant="outline" size="sm">Connect</Button>
+                          <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <span className="font-medium">LinkedIn</span>
+                            <Button variant="outline" size="sm" className="px-4">Connect</Button>
                           </div>
                         </div>
                       </div>

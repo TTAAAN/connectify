@@ -1,15 +1,19 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
-import { MapPin, Calendar, Bookmark, CheckCircle, Clock, Building2, User } from 'lucide-react';
+import { MapPin, Calendar, Bookmark, BookmarkCheck, CheckCircle, Clock, Building2, User } from 'lucide-react';
 import { Opportunity } from '../lib/mockData';
+import { toast } from 'sonner';
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
 }
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
+  const [isSaved, setIsSaved] = useState(false);
+
   const categoryColors: Record<string, string> = {
     'Volunteering': 'bg-sky-100 text-sky-700',
     'Workshops': 'bg-blue-100 text-blue-700',
@@ -19,8 +23,19 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     'Events': 'bg-blue-50 text-blue-600'
   };
 
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsSaved(!isSaved);
+    if (!isSaved) {
+      toast.success(`"${opportunity.title}" saved to your list!`);
+    } else {
+      toast.info(`"${opportunity.title}" removed from saved list`);
+    }
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
+    <Card className="hover:shadow-lg transition-all duration-200 flex flex-col h-full group">
       <CardHeader>
         <div className="flex items-start justify-between gap-2 mb-2">
           <Badge className={categoryColors[opportunity.category]}>
@@ -38,18 +53,18 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             </Badge>
           )}
         </div>
-        <h3 className="text-xl">{opportunity.title}</h3>
+        <h3 className="text-xl group-hover:text-blue-600 transition-colors">{opportunity.title}</h3>
         <p className="text-gray-600">{opportunity.organization}</p>
       </CardHeader>
       
       <CardContent className="flex-grow">
         <div className="space-y-2 text-sm text-gray-600">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
+            <MapPin className="h-4 w-4 text-blue-500" />
             <span>{opportunity.location}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 text-blue-500" />
             <span>{new Date(opportunity.date).toLocaleDateString()}</span>
           </div>
         </div>
@@ -64,8 +79,13 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             View Details
           </Button>
         </Link>
-        <Button variant="ghost" size="icon" className="h-10 w-10">
-          <Bookmark className="h-5 w-5" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`h-10 w-10 transition-colors ${isSaved ? 'text-blue-600 bg-blue-50 hover:bg-blue-100' : 'hover:text-blue-600'}`}
+          onClick={handleSave}
+        >
+          {isSaved ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
         </Button>
       </CardFooter>
     </Card>

@@ -11,10 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../components/ui/checkbox';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { AlertCircle, CheckCircle, Save } from 'lucide-react';
+import { AlertCircle, CheckCircle, Save, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function EventSubmission() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -41,6 +43,7 @@ export function EventSubmission() {
   const handleNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+      toast.info(`Step ${currentStep + 1} of ${totalSteps}`);
     }
   };
 
@@ -50,8 +53,17 @@ export function EventSubmission() {
     }
   };
 
+  const handleSaveDraft = () => {
+    toast.success('Draft saved successfully!');
+  };
+
   const handleSubmit = () => {
-    navigate('/submission-confirmation');
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success('Opportunity submitted for review!');
+      navigate('/submission-confirmation');
+    }, 1500);
   };
 
   return (
@@ -385,7 +397,7 @@ export function EventSubmission() {
                   Previous
                 </Button>
 
-                <Button variant="ghost" className="gap-2">
+                <Button variant="ghost" className="gap-2" onClick={handleSaveDraft}>
                   <Save className="h-4 w-4" />
                   Save as Draft
                 </Button>
@@ -401,8 +413,16 @@ export function EventSubmission() {
                   <Button 
                     onClick={handleSubmit}
                     className="bg-blue-600 hover:bg-blue-700"
+                    disabled={isSubmitting}
                   >
-                    Submit for Review
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit for Review'
+                    )}
                   </Button>
                 )}
               </div>
