@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -9,14 +10,17 @@ import { OpportunityCard } from '../components/OpportunityCard';
 import { mockOpportunities } from '../lib/mockData';
 import { 
   MapPin, Calendar, Clock, Users, Mail, Globe, 
-  Bookmark, Share2, Flag, CheckCircle, AlertCircle,
-  ChevronRight, ExternalLink, Building2, User
+  Bookmark, BookmarkCheck, Share2, Flag, CheckCircle, AlertCircle,
+  ChevronRight, ExternalLink, Building2, User, Loader2
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function OpportunityDetail() {
   const { id } = useParams();
   const opportunity = mockOpportunities.find(o => o.id === id);
   const similarOpportunities = mockOpportunities.filter(o => o.id !== id && o.category === opportunity?.category).slice(0, 3);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
   if (!opportunity) {
     return <div>Opportunity not found</div>;
@@ -29,6 +33,32 @@ export function OpportunityDetail() {
     'Internships': 'bg-cyan-100 text-cyan-700',
     'Jobs': 'bg-blue-200 text-blue-800',
     'Events': 'bg-blue-50 text-blue-600'
+  };
+
+  const handleSave = () => {
+    setIsSaved(!isSaved);
+    if (!isSaved) {
+      toast.success(`"${opportunity.title}" saved to your list!`);
+    } else {
+      toast.info(`"${opportunity.title}" removed from saved list`);
+    }
+  };
+
+  const handleApply = () => {
+    setIsApplying(true);
+    setTimeout(() => {
+      setIsApplying(false);
+      toast.success('Application submitted successfully! You will receive a confirmation email shortly.');
+    }, 1500);
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success('Link copied to clipboard!');
+  };
+
+  const handleReport = () => {
+    toast.info('Report submitted. Our team will review this listing.');
   };
 
   return (
@@ -94,19 +124,32 @@ export function OpportunityDetail() {
                 <Button 
                   size="lg" 
                   className="bg-blue-600 hover:bg-blue-700"
-                  disabled={!opportunity.isPartnered && !opportunity.verified}
+                  disabled={(!opportunity.isPartnered && !opportunity.verified) || isApplying}
+                  onClick={handleApply}
                 >
-                  {(opportunity.isPartnered || opportunity.verified) ? 'Apply Now' : 'Pending Verification'}
+                  {isApplying ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Applying...
+                    </>
+                  ) : (
+                    (opportunity.isPartnered || opportunity.verified) ? 'Apply Now' : 'Pending Verification'
+                  )}
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Bookmark className="h-5 w-5 mr-2" />
-                  Save
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={handleSave}
+                  className={isSaved ? 'border-blue-500 text-blue-600 bg-blue-50' : ''}
+                >
+                  {isSaved ? <BookmarkCheck className="h-5 w-5 mr-2" /> : <Bookmark className="h-5 w-5 mr-2" />}
+                  {isSaved ? 'Saved' : 'Save'}
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={handleShare}>
                   <Share2 className="h-5 w-5 mr-2" />
                   Share
                 </Button>
-                <Button variant="ghost" size="lg" className="ml-auto">
+                <Button variant="ghost" size="lg" className="ml-auto" onClick={handleReport}>
                   <Flag className="h-5 w-5 mr-2" />
                   Report
                 </Button>
