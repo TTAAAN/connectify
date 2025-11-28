@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { OpportunityCard } from '../components/OpportunityCard';
@@ -11,21 +11,119 @@ import { Separator } from '../components/ui/separator';
 import { Switch } from '../components/ui/switch';
 import { mockOpportunities } from '../lib/mockData';
 import { Grid3x3, List, MapPin, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function OpportunitySearch() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPosterTypes, setSelectedPosterTypes] = useState<string[]>([]);
+  const [selectedLocationTypes, setSelectedLocationTypes] = useState<string[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('relevance');
 
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
   
-  const filteredOpportunities = mockOpportunities.filter(opportunity => {
-    if (selectedPosterTypes.length > 0) {
-      if (selectedPosterTypes.includes('user') && opportunity.isPartnered) return false;
-      if (selectedPosterTypes.includes('partnered') && !opportunity.isPartnered) return false;
+  const filteredOpportunities = useMemo(() => {
+    let filtered = [...mockOpportunities];
+
+    // Filter by category
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(opp => selectedCategories.includes(opp.category));
     }
-    return true;
-  });
+
+    // Filter by poster type
+    if (selectedPosterTypes.length > 0) {
+      if (selectedPosterTypes.includes('user') && !selectedPosterTypes.includes('partnered')) {
+        filtered = filtered.filter(opp => !opp.isPartnered);
+      } else if (selectedPosterTypes.includes('partnered') && !selectedPosterTypes.includes('user')) {
+        filtered = filtered.filter(opp => opp.isPartnered);
+      }
+    }
+
+    // Filter by location type
+    if (selectedLocationTypes.length > 0) {
+      filtered = filtered.filter(opp => {
+        if (selectedLocationTypes.includes('remote') && opp.isRemote) return true;
+        if (selectedLocationTypes.includes('inperson') && !opp.isRemote) return true;
+        return false;
+      });
+    }
+
+    // Filter by location
+    if (selectedLocation && selectedLocation !== 'all') {
+      const locationMap: Record<string, string> = {
+        'sf': 'San Francisco',
+        'ny': 'New York',
+        'boston': 'Boston',
+        'seattle': 'Seattle'
+      };
+      filtered = filtered.filter(opp => 
+        opp.location.toLowerCase().includes(locationMap[selectedLocation]?.toLowerCase() || '')
+      );
+    }
+
+    // Filter by date range
+    if (dateRange) {
+      const now = new Date();
+      filtered = filtered.filter(opp => {
+        const oppDate = new Date(opp.date);
+        switch(dateRange) {
+          case 'today':
+            return oppDate.toDateString() === now.toDateString();
+          case 'week':
+            const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            return oppDate >= now && oppDate <= weekFromNow;
+          case 'month':
+            const monthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+            return oppDate >= now && oppDate <= monthFromNow;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Sort results
+    switch(sortBy) {
+      case 'date':
+        filtered.sort((a, b) => new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime());
+        break;
+      case 'deadline':
+        filtered.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+        break;
+      case 'verified':
+        filtered.sort((a, b) => (b.verified ? 1 : 0) - (a.verified ? 1 : 0));
+        break;
+    }
+
+    return filtered;
+  }, [selectedCategories, selectedPosterTypes, selectedLocationTypes, selectedLocation, dateRange, sortBy]);
+
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories([...selectedCategories, category]);
+    } else {
+      setSelectedCategories(selectedCategories.filter(c => c !== category));
+    }
+  };
+
+  const handleLocationTypeChange = (type: string, checked: boolean) => {
+    if (checked) {
+      setSelectedLocationTypes([...selectedLocationTypes, type]);
+    } else {
+      setSelectedLocationTypes(selectedLocationTypes.filter(t => t !== type));
+    }
+  };
+
+  const handleReset = () => {
+    setSelectedCategories([]);
+    setSelectedPosterTypes([]);
+    setSelectedLocationTypes([]);
+    setSelectedLocation('all');
+    setDateRange('');
+    setSortBy('relevance');
+    toast.info('Filters reset');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,7 +142,7 @@ export function OpportunitySearch() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg">Filters</h3>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
+                  <Button variant="ghost" size="sm" className="text-blue-600" onClick={handleReset}>
                     <RotateCcw className="h-4 w-4 mr-1" />
                     Reset
                   </Button>
@@ -56,7 +154,11 @@ export function OpportunitySearch() {
                   <div className="space-y-2">
                     {categories.map((category) => (
                       <div key={category} className="flex items-center gap-2">
-                        <Checkbox id={category} />
+                        <Checkbox 
+                          id={category} 
+                          checked={selectedCategories.includes(category)}
+                          onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                        />
                         <Label htmlFor={category} className="cursor-pointer">
                           {category}
                         </Label>
@@ -72,21 +174,23 @@ export function OpportunitySearch() {
                   <h4 className="mb-3">Location Type</h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Checkbox id="remote" />
+                      <Checkbox 
+                        id="remote" 
+                        checked={selectedLocationTypes.includes('remote')}
+                        onCheckedChange={(checked) => handleLocationTypeChange('remote', checked as boolean)}
+                      />
                       <Label htmlFor="remote" className="cursor-pointer">
                         Remote
                       </Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Checkbox id="inperson" />
+                      <Checkbox 
+                        id="inperson" 
+                        checked={selectedLocationTypes.includes('inperson')}
+                        onCheckedChange={(checked) => handleLocationTypeChange('inperson', checked as boolean)}
+                      />
                       <Label htmlFor="inperson" className="cursor-pointer">
                         In-Person
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="hybrid" />
-                      <Label htmlFor="hybrid" className="cursor-pointer">
-                        Hybrid
                       </Label>
                     </div>
                   </div>
@@ -97,7 +201,7 @@ export function OpportunitySearch() {
                 {/* Date Range */}
                 <div className="mb-6">
                   <h4 className="mb-3">Date Range</h4>
-                  <Select>
+                  <Select value={dateRange} onValueChange={setDateRange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select date range" />
                     </SelectTrigger>
@@ -105,7 +209,6 @@ export function OpportunitySearch() {
                       <SelectItem value="today">Today</SelectItem>
                       <SelectItem value="week">This Week</SelectItem>
                       <SelectItem value="month">This Month</SelectItem>
-                      <SelectItem value="custom">Custom Range</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -115,7 +218,7 @@ export function OpportunitySearch() {
                 {/* Location */}
                 <div className="mb-6">
                   <h4 className="mb-3">Location</h4>
-                  <Select>
+                  <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select location" />
                     </SelectTrigger>
@@ -127,12 +230,6 @@ export function OpportunitySearch() {
                       <SelectItem value="seattle">Seattle, WA</SelectItem>
                     </SelectContent>
                   </Select>
-                  <div className="flex items-center gap-2 mt-3">
-                    <Switch id="mapToggle" />
-                    <Label htmlFor="mapToggle" className="cursor-pointer text-sm">
-                      Show map view
-                    </Label>
-                  </div>
                 </div>
 
                 <Separator className="my-6" />
@@ -215,7 +312,7 @@ export function OpportunitySearch() {
               </div>
 
               <div className="flex items-center gap-4">
-                <Select defaultValue="relevance">
+                <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
                   </SelectTrigger>
