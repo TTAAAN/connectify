@@ -224,34 +224,6 @@ export function OpportunityDetail() {
                           </DialogContent>
                         </Dialog>
                       )}
-                      {/* Button to view all subcategories even if no overflow */}
-                      {subcategories.length > 0 && hiddenCount <= 0 && subcategories.length >= 2 && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-blue-600 h-6 px-2 text-xs">
-                              View all
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle className="flex items-center gap-2">
-                                <Tag className="h-5 w-5" />
-                                All Subcategories
-                              </DialogTitle>
-                              <DialogDescription>
-                                This opportunity is tagged with the following subcategories:
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="flex flex-wrap gap-2 mt-4">
-                              {subcategories.map((sub, index) => (
-                                <Badge key={index} variant="outline" className="text-gray-700 py-1 px-3">
-                                  {sub}
-                                </Badge>
-                              ))}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      )}
                     </div>
                   )}
                   

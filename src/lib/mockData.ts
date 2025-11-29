@@ -240,6 +240,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Junior Frontend Developer",
     organization: "StartupXYZ Cambodia",
     category: "Jobs",
+    subcategory: "Technology",
     subcategories: ["Technology", "Career Development", "Business"],
     verified: false,
     location: "Remote",
