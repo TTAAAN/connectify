@@ -11,7 +11,11 @@ export interface Opportunity {
     | "Competitions"
     | "Internships"
     | "Jobs"
-    | "Events";
+    | "Events"
+    | "Fun"
+    | "Technology"
+    | "Education"
+    | "ETC";
   verified: boolean;
   verifiedDate?: string;
   isPartnered?: boolean;

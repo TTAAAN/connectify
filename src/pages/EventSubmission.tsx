@@ -232,6 +232,10 @@ export function EventSubmission() {
                         <SelectItem value="internships">Internships</SelectItem>
                         <SelectItem value="jobs">Jobs</SelectItem>
                         <SelectItem value="events">Events</SelectItem>
+                        <SelectItem value="fun">Fun</SelectItem>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="etc">ETC</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
