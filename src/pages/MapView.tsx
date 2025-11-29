@@ -60,7 +60,7 @@ const categoryIcons: Record<string, Icon> = {
   'Competitions': createCategoryIcon('violet'),
   'Internships': createCategoryIcon('orange'),
   'Jobs': createCategoryIcon('red'),
-  'Events': createCategoryIcon('gold'),
+  'Events': createCategoryIcon('black'), // changed from 'gold' to 'yellow'
 };
 
 // Component to handle map center updates
@@ -110,14 +110,14 @@ export function MapView() {
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
   const subcategories = allSubcategories;
 
-  const categoryColors: Record<string, string> = {
-    'Volunteering': 'bg-sky-500',
-    'Workshops': 'bg-green-500',
-    'Competitions': 'bg-violet-500',
-    'Internships': 'bg-orange-500',
-    'Jobs': 'bg-red-500',
-    'Events': 'bg-yellow-500'
-  };
+    const categoryColors: Record<string, string> = {
+      'Volunteering': 'bg-sky-500',
+      'Workshops': 'bg-green-500',
+      'Competitions': 'bg-indigo-500',
+      'Internships': 'bg-blue-500',
+      'Jobs': 'bg-red-500',
+      'Events': 'bg-cyan-500',
+    };
 
   const handleCategoryToggle = (category: string, checked: boolean) => {
     if (checked) {
@@ -571,12 +571,7 @@ export function MapView() {
                   <div className="flex items-center gap-1">
                     {/* Show page numbers with ellipsis */}
                     {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter(page => {
-                        // Always show first, last, current, and adjacent pages
-                        if (page === 1 || page === totalPages) return true;
-                        if (Math.abs(page - currentPage) <= 1) return true;
-                        return false;
-                      })
+                      .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
                       .map((page, index, arr) => {
                         // Add ellipsis between non-adjacent pages
                         const showEllipsisBefore = index > 0 && page - arr[index - 1] > 1;

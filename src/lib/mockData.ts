@@ -375,7 +375,7 @@ function generateMockOpportunities(count: number): Opportunity[] {
 export const mockOpportunities: Opportunity[] = generateMockOpportunities(1000);
 
 // Export unique locations for filtering
-export const uniqueLocations = [...new Set(mockOpportunities.map(opp => opp.location))].sort();
+export const uniqueLocations = Array.from(new Set(mockOpportunities.map(opp => opp.location))).sort();
 
 export const mockSubmissions: Submission[] = [
   {
