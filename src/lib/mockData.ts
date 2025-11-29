@@ -324,6 +324,9 @@ function generateMockOpportunities(count: number): Opportunity[] {
     const statuses: Opportunity["status"][] = ["Open", "Closed", "Full"];
     const status = statuses[Math.floor(random() * 10) < 7 ? 0 : Math.floor(random() * 3)];
 
+    // Generate organization domain for contact/website
+    const orgDomain = organization.toLowerCase().replace(/\s+/g, "");
+
     opportunities.push({
       id: String(i),
       title: `${titlePrefix} ${titleSuffix} ${Math.floor(random() * 100)}`,
@@ -353,8 +356,8 @@ function generateMockOpportunities(count: number): Opportunity[] {
       capacity: String(Math.floor(random() * 100) + 10),
       postedDate: postedDate.toISOString().split("T")[0],
       lastUpdated: postedDate.toISOString().split("T")[0],
-      contact: `contact@${organization.toLowerCase().replace(/\s+/g, "")}.org`,
-      website: `https://${organization.toLowerCase().replace(/\s+/g, "")}.org`,
+      contact: `contact@${orgDomain}.org`,
+      website: `https://${orgDomain}.org`,
       coordinates: {
         lat: locationData.lat + latVariance,
         lng: locationData.lng + lngVariance,

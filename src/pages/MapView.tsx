@@ -89,7 +89,6 @@ export function MapView() {
     } else {
       setSelectedCategories([...selectedCategories, category]);
     }
-    setCurrentPage(1); // Reset to first page when filter changes
   };
 
   const filteredOpportunities = useMemo(() => {
@@ -102,7 +101,7 @@ export function MapView() {
       if (selectedLocation !== 'all' && opp.location !== selectedLocation) {
         return false;
       }
-      // Subcategory filter
+      // Subcategory filter - checks both subcategories array and subcategory property for compatibility
       if (selectedSubcategory !== 'all') {
         const hasSubcategory = opp.subcategories?.includes(selectedSubcategory as SubcategoryType) || 
                                opp.subcategory === selectedSubcategory;
@@ -127,10 +126,10 @@ export function MapView() {
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const paginatedOpportunities = filteredOpportunities.slice(startIndex, endIndex);
 
-  // Reset to first page when filters change
+  // Reset to first page when any filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedLocation, selectedSubcategory, searchQuery]);
+  }, [selectedCategories, selectedLocation, selectedSubcategory, searchQuery]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
