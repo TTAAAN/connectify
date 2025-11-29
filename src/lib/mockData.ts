@@ -12,6 +12,7 @@ export interface Opportunity {
     | "Internships"
     | "Jobs"
     | "Events";
+  subcategory?: "Fun" | "Technology" | "Education" | "ETC";
   verified: boolean;
   verifiedDate?: string;
   isPartnered?: boolean;
@@ -63,6 +64,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Community Garden Volunteer Program",
     organization: "Green Earth Initiative Cambodia",
     category: "Volunteering",
+    subcategory: "Fun",
     verified: true,
     verifiedDate: "2025-11-10",
     location: "Phnom Penh, Cambodia",
@@ -96,6 +98,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "UX Design Workshop: Figma Masterclass",
     organization: "Design Academy Cambodia",
     category: "Workshops",
+    subcategory: "Technology",
     verified: true,
     verifiedDate: "2025-11-12",
     isPartnered: true,
@@ -130,6 +133,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "AI Hackthon 2025: AI Masterclass",
     organization: "TechHub Siem Reap",
     category: "Competitions",
+    subcategory: "Technology",
     verified: true,
     verifiedDate: "2025-11-08",
     isPartnered: true,
@@ -164,6 +168,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Software Engineering Internship",
     organization: "CloudTech Cambodia",
     category: "Internships",
+    subcategory: "Technology",
     verified: true,
     verifiedDate: "2025-11-15",
     location: "Battambang, Cambodia",
@@ -230,6 +235,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Tech Career Fair 2025",
     organization: "University Career Center",
     category: "Events",
+    subcategory: "Education",
     verified: true,
     verifiedDate: "2025-11-11",
     location: "Kampong Cham, Cambodia",
@@ -263,6 +269,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Data Science Bootcamp",
     organization: "Learning Hub",
     category: "Workshops",
+    subcategory: "Education",
     verified: true,
     verifiedDate: "2025-11-14",
     location: "Sihanoukville, Cambodia",

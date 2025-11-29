@@ -25,6 +25,7 @@ export function EventSubmission() {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
+    subcategory: '',
     organization: '',
     organizationWebsite: '',
     shortDescription: '',
@@ -232,6 +233,22 @@ export function EventSubmission() {
                         <SelectItem value="internships">Internships</SelectItem>
                         <SelectItem value="jobs">Jobs</SelectItem>
                         <SelectItem value="events">Events</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="subcategory">Subcategory (Optional)</Label>
+                    <Select value={formData.subcategory} onValueChange={(value) => setFormData({...formData, subcategory: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a subcategory" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="fun">Fun</SelectItem>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="etc">ETC</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

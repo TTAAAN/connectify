@@ -127,12 +127,13 @@ export function MapView() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       <Header isAuthenticated />
 
-      <div className="flex-1 relative overflow-hidden">
+      {/* Main content area with proper height calculation */}
+      <div className="flex-1 relative" style={{ height: 'calc(100vh - 73px)' }}>
         {/* Map Area */}
-        <div className="absolute inset-0 overflow-hidden bg-gray-200">
+        <div className="absolute inset-0 bg-gray-200">
           <MapContainer 
             center={mapCenter} 
             zoom={7} 
@@ -185,8 +186,8 @@ export function MapView() {
             ))}
           </MapContainer>
 
-          {/* Map Controls */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000]">
+          {/* Search Bar - positioned below header with proper spacing */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto">
             <form onSubmit={handleSearch} className="bg-white rounded-lg shadow-lg p-2 w-96">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -200,13 +201,13 @@ export function MapView() {
             </form>
           </div>
 
-          {/* Filter Chips */}
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[1000]">
-            <div className="flex items-center gap-2 bg-white rounded-lg shadow-lg p-2">
+          {/* Filter Chips - positioned below search bar */}
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto">
+            <div className="flex flex-wrap items-center justify-center gap-2 bg-white rounded-lg shadow-lg p-2 max-w-[90vw]">
               {Object.entries(categoryColors).map(([category, color]) => (
                 <Badge 
                   key={category}
-                  className={`cursor-pointer transition-opacity ${color} text-white ${
+                  className={`cursor-pointer transition-opacity ${color} text-white text-xs ${
                     selectedCategories.length > 0 && !selectedCategories.includes(category) 
                       ? 'opacity-50' 
                       : ''
@@ -220,7 +221,7 @@ export function MapView() {
           </div>
 
           {/* Current Location Button */}
-          <div className="absolute bottom-24 right-4 z-[1000]">
+          <div className="absolute bottom-36 right-4 z-[1000] pointer-events-auto">
             <Button 
               size="icon" 
               className="bg-white text-gray-700 shadow-lg hover:bg-gray-50"
@@ -230,19 +231,19 @@ export function MapView() {
             </Button>
           </div>
 
-          {/* Legend */}
-          <div className="absolute bottom-4 right-4 z-[1000]">
-            <Card className="w-64">
-              <CardContent className="pt-4">
+          {/* Legend - positioned in bottom right with proper spacing */}
+          <div className="absolute bottom-4 right-4 z-[1000] pointer-events-auto">
+            <Card className="w-48 bg-white/95 backdrop-blur-sm shadow-lg">
+              <CardContent className="pt-3 pb-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Layers className="h-4 w-4" />
                   <span className="text-sm font-medium">Legend</span>
                 </div>
-                <div className="space-y-1 text-xs">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
                   {Object.entries(categoryColors).map(([category, color]) => (
-                    <div key={category} className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${color}`}></div>
-                      <span>{category}</span>
+                    <div key={category} className="flex items-center gap-1">
+                      <div className={`w-2 h-2 rounded-full ${color} flex-shrink-0`}></div>
+                      <span className="truncate">{category}</span>
                     </div>
                   ))}
                 </div>

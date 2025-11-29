@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { OpportunityCard } from '../components/OpportunityCard';
@@ -9,35 +9,54 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Separator } from '../components/ui/separator';
-import { Switch } from '../components/ui/switch';
-import { mockOpportunities, Opportunity } from '../lib/mockData';
-import { Grid3x3, List, MapPin, RotateCcw, Search, Loader2 } from 'lucide-react';
+import { mockOpportunities } from '../lib/mockData';
+import { Grid3x3, List, MapPin, RotateCcw, Search } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { toast } from 'sonner';
 
 export function OpportunitySearch() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedPosterTypes, setSelectedPosterTypes] = useState<string[]>([]);
   const [selectedLocationTypes, setSelectedLocationTypes] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<string>('');
-  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>('relevance');
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
-  const [showMapView, setShowMapView] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
 
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
-  const locations = [
-    { value: 'all', label: 'All Locations' },
-    { value: 'sf', label: 'San Francisco, CA' },
-    { value: 'ny', label: 'New York, NY' },
-    { value: 'boston', label: 'Boston, MA' },
-    { value: 'seattle', label: 'Seattle, WA' },
-    { value: 'austin', label: 'Austin, TX' },
-    { value: 'miami', label: 'Miami, FL' },
+  const subcategories = ['Fun', 'Technology', 'Education', 'ETC'];
+  
+  // Cambodia provinces for location filter
+  const cambodiaProvinces = [
+    'Phnom Penh',
+    'Siem Reap',
+    'Battambang',
+    'Sihanoukville',
+    'Kampong Cham',
+    'Kep',
+    'Kampot',
+    'Kandal',
+    'Takeo',
+    'Prey Veng',
+    'Svay Rieng',
+    'Kampong Thom',
+    'Kampong Speu',
+    'Kampong Chhnang',
+    'Pursat',
+    'Kratie',
+    'Mondulkiri',
+    'Ratanakiri',
+    'Stung Treng',
+    'Preah Vihear',
+    'Oddar Meanchey',
+    'Banteay Meanchey',
+    'Pailin',
+    'Koh Kong',
+    'Tbong Khmum'
   ];
 
   // Initialize search from URL params
@@ -56,6 +75,14 @@ export function OpportunitySearch() {
     }
   };
 
+  const handleSubcategoryToggle = (subcategory: string, checked: boolean) => {
+    if (checked) {
+      setSelectedSubcategories([...selectedSubcategories, subcategory]);
+    } else {
+      setSelectedSubcategories(selectedSubcategories.filter(s => s !== subcategory));
+    }
+  };
+
   const handleLocationTypeToggle = (type: string, checked: boolean) => {
     if (checked) {
       setSelectedLocationTypes([...selectedLocationTypes, type]);
@@ -64,22 +91,24 @@ export function OpportunitySearch() {
     }
   };
 
+  const handleProvinceToggle = (province: string, checked: boolean) => {
+    if (checked) {
+      setSelectedProvinces([...selectedProvinces, province]);
+    } else {
+      setSelectedProvinces(selectedProvinces.filter(p => p !== province));
+    }
+  };
+
   const resetFilters = () => {
     setSelectedCategories([]);
+    setSelectedSubcategories([]);
     setSelectedPosterTypes([]);
     setSelectedLocationTypes([]);
     setDateRange('');
-    setSelectedLocation('');
+    setSelectedProvinces([]);
     setSortBy('relevance');
     setSearchQuery('');
     toast.info('Filters reset', { description: 'All filters have been cleared.' });
-  };
-
-  const handleMapToggle = (checked: boolean) => {
-    setShowMapView(checked);
-    if (checked) {
-      navigate('/map');
-    }
   };
   
   // Filter opportunities
@@ -95,9 +124,22 @@ export function OpportunitySearch() {
       if (!matchesSearch) return false;
     }
 
+    // Province filter (for Cambodia locations)
+    if (selectedProvinces.length > 0) {
+      const matchesProvince = selectedProvinces.some(province => 
+        opportunity.location.toLowerCase().includes(province.toLowerCase())
+      );
+      if (!matchesProvince) return false;
+    }
+
     // Category filter
     if (selectedCategories.length > 0) {
       if (!selectedCategories.includes(opportunity.category)) return false;
+    }
+
+    // Subcategory filter (filters by the subcategory field)
+    if (selectedSubcategories.length > 0) {
+      if (!opportunity.subcategory || !selectedSubcategories.includes(opportunity.subcategory)) return false;
     }
 
     // Poster type filter
@@ -112,19 +154,6 @@ export function OpportunitySearch() {
       const isInPerson = !opportunity.isRemote;
       if (selectedLocationTypes.includes('remote') && !selectedLocationTypes.includes('inperson') && !isRemote) return false;
       if (selectedLocationTypes.includes('inperson') && !selectedLocationTypes.includes('remote') && isRemote) return false;
-    }
-
-    // Location filter
-    if (selectedLocation && selectedLocation !== 'all') {
-      const locationMap: Record<string, string> = {
-        sf: 'San Francisco',
-        ny: 'New York',
-        boston: 'Boston',
-        seattle: 'Seattle',
-        austin: 'Austin',
-        miami: 'Miami',
-      };
-      if (!opportunity.location.includes(locationMap[selectedLocation])) return false;
     }
 
     // Date range filter
@@ -167,8 +196,8 @@ export function OpportunitySearch() {
     }
   });
 
-  const activeFiltersCount = selectedCategories.length + selectedPosterTypes.length + 
-    selectedLocationTypes.length + (dateRange ? 1 : 0) + (selectedLocation && selectedLocation !== 'all' ? 1 : 0);
+  const activeFiltersCount = selectedCategories.length + selectedSubcategories.length + selectedPosterTypes.length + 
+    selectedLocationTypes.length + (dateRange ? 1 : 0) + selectedProvinces.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -213,7 +242,54 @@ export function OpportunitySearch() {
                   </Button>
                 </div>
 
-                {/* Category */}
+                {/* Filter by Location - Cambodia Provinces (moved to top) */}
+                <div className="mb-6">
+                  <h4 className="mb-3 flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Filter by Location
+                  </h4>
+                  <Select 
+                    value={selectedProvinces.length > 0 ? "selected" : ""}
+                    onValueChange={() => {}}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select provinces" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2 max-h-60 overflow-y-auto">
+                        {cambodiaProvinces.map((province) => (
+                          <div key={province} className="flex items-center gap-2 py-1">
+                            <Checkbox 
+                              id={`province-${province}`}
+                              checked={selectedProvinces.includes(province)}
+                              onCheckedChange={(checked) => handleProvinceToggle(province, checked as boolean)}
+                            />
+                            <Label htmlFor={`province-${province}`} className="cursor-pointer text-sm">
+                              {province}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </SelectContent>
+                  </Select>
+                  {selectedProvinces.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {selectedProvinces.map((province) => (
+                        <span 
+                          key={province}
+                          className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full cursor-pointer hover:bg-blue-200"
+                          onClick={() => handleProvinceToggle(province, false)}
+                        >
+                          {province} ×
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <Separator className="my-6" />
+
+                {/* Category - Main categories first */}
                 <div className="mb-6">
                   <h4 className="mb-3">Category</h4>
                   <div className="space-y-2">
@@ -230,6 +306,50 @@ export function OpportunitySearch() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                <Separator className="my-6" />
+
+                {/* Subcategory Filter - Using dropdown for scalability */}
+                <div className="mb-6">
+                  <h4 className="mb-3">Subcategory</h4>
+                  <Select 
+                    value={selectedSubcategories.length > 0 ? "selected" : ""}
+                    onValueChange={() => {}}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select subcategories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2 max-h-60 overflow-y-auto">
+                        {subcategories.map((subcategory) => (
+                          <div key={subcategory} className="flex items-center gap-2 py-1">
+                            <Checkbox 
+                              id={`subcategory-${subcategory}`}
+                              checked={selectedSubcategories.includes(subcategory)}
+                              onCheckedChange={(checked) => handleSubcategoryToggle(subcategory, checked as boolean)}
+                            />
+                            <Label htmlFor={`subcategory-${subcategory}`} className="cursor-pointer text-sm">
+                              {subcategory}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </SelectContent>
+                  </Select>
+                  {selectedSubcategories.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {selectedSubcategories.map((subcategory) => (
+                        <span 
+                          key={subcategory}
+                          className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full cursor-pointer hover:bg-green-200"
+                          onClick={() => handleSubcategoryToggle(subcategory, false)}
+                        >
+                          {subcategory} ×
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <Separator className="my-6" />
@@ -287,29 +407,6 @@ export function OpportunitySearch() {
 
                 <Separator className="my-6" />
 
-                {/* Location */}
-                <div className="mb-6">
-                  <h4 className="mb-3">Location</h4>
-                  <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations.map((loc) => (
-                        <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex items-center gap-2 mt-3">
-                    <Switch id="mapToggle" checked={showMapView} onCheckedChange={handleMapToggle} />
-                    <Label htmlFor="mapToggle" className="cursor-pointer text-sm">
-                      Show map view
-                    </Label>
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
                 {/* Posted By */}
                 <div className="mb-6">
                   <h4 className="mb-3">Posted By</h4>
@@ -344,33 +441,6 @@ export function OpportunitySearch() {
                       />
                       <Label htmlFor="partnered" className="cursor-pointer">
                         Posted by Partnered Organization
-                      </Label>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
-                {/* Organization Type */}
-                <div className="mb-6">
-                  <h4 className="mb-3">Organization Type</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="nonprofit" />
-                      <Label htmlFor="nonprofit" className="cursor-pointer">
-                        Non-Profit
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="corporate" />
-                      <Label htmlFor="corporate" className="cursor-pointer">
-                        Corporate
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="educational" />
-                      <Label htmlFor="educational" className="cursor-pointer">
-                        Educational
                       </Label>
                     </div>
                   </div>
