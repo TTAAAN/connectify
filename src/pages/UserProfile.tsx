@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Button } from '../components/ui/button';
@@ -16,12 +16,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { mockOpportunities } from '../lib/mockData';
 import { toast } from 'sonner';
 import { 
-  User, Mail, MapPin, Calendar, Bookmark,
-  Send, FileText, Lock, Edit, CheckCircle, Clock, Upload, Camera, Loader2, Trash2, ExternalLink
+  MapPin, Calendar, Bookmark,
+  Edit, CheckCircle, Clock, Upload, Camera, Loader2, Trash2, ExternalLink
 } from 'lucide-react';
 
 export function UserProfile() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('personal');
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
