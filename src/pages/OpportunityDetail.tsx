@@ -20,7 +20,7 @@ import {
 import { 
   MapPin, Calendar, Clock, Users, Mail, Globe, 
   Bookmark, Share2, Flag, CheckCircle, AlertCircle,
-  ChevronRight, ExternalLink, Building2, User, Loader2, Tag
+  ChevronRight, ExternalLink, Building2, User, Loader2, Tag, CalendarPlus, DollarSign
 } from 'lucide-react';
 
 const MAX_VISIBLE_SUBCATEGORIES = 3;
@@ -114,6 +114,41 @@ export function OpportunityDetail() {
     setIsApplying(false);
     toast.success('Application submitted!', {
       description: `Your application for ${opportunity.title} has been sent to ${opportunity.organization}.`,
+    });
+  };
+
+  // Default event duration by category (in hours)
+  const categoryDurations: Record<string, number> = {
+    'Volunteering': 4,
+    'Workshops': 3,
+    'Competitions': 8,
+    'Internships': 8,
+    'Jobs': 1,
+    'Events': 2,
+  };
+
+  // Format date for Google Calendar URL (YYYYMMDDTHHMMSSZ format)
+  const formatDateForCalendar = (date: Date): string => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
+  const handleAddToCalendar = () => {
+    // Create Google Calendar URL
+    const startDate = new Date(opportunity.date);
+    const endDate = new Date(startDate);
+    const duration = categoryDurations[opportunity.category] || 2;
+    endDate.setHours(endDate.getHours() + duration);
+
+    const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
+    googleCalendarUrl.searchParams.set('action', 'TEMPLATE');
+    googleCalendarUrl.searchParams.set('text', opportunity.title);
+    googleCalendarUrl.searchParams.set('dates', `${formatDateForCalendar(startDate)}/${formatDateForCalendar(endDate)}`);
+    googleCalendarUrl.searchParams.set('details', `${opportunity.description}\n\nOrganization: ${opportunity.organization}\nWebsite: ${opportunity.website}`);
+    googleCalendarUrl.searchParams.set('location', opportunity.location);
+    
+    window.open(googleCalendarUrl.toString(), '_blank');
+    toast.success('Opening Google Calendar', {
+      description: 'Add this event to your calendar to never miss it!',
     });
   };
 
@@ -257,6 +292,10 @@ export function OpportunityDetail() {
                   <Bookmark className={`h-5 w-5 mr-2 ${isBookmarked ? 'fill-blue-600 text-blue-600' : ''}`} />
                   {isBookmarked ? 'Saved' : 'Save'}
                 </Button>
+                <Button variant="outline" size="lg" onClick={handleAddToCalendar}>
+                  <CalendarPlus className="h-5 w-5 mr-2" />
+                  Add to Calendar
+                </Button>
                 <Button variant="outline" size="lg" onClick={handleShare}>
                   <Share2 className="h-5 w-5 mr-2" />
                   Share
@@ -391,6 +430,17 @@ export function OpportunityDetail() {
                     <div>
                       <div className="text-sm text-gray-600">Capacity</div>
                       <div>{opportunity.capacity} {opportunity.capacity !== 'Unlimited' ? 'spots' : ''}</div>
+                    </div>
+                  </div>
+
+                  {/* Fee */}
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="h-5 w-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <div className="text-sm text-gray-600">Fee to Join</div>
+                      <div className={opportunity.fee === 0 ? 'text-green-600 font-medium' : ''}>
+                        {opportunity.fee === 0 ? 'Free' : `$${opportunity.fee} USD`}
+                      </div>
                     </div>
                   </div>
 

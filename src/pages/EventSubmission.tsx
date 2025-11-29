@@ -11,10 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../components/ui/checkbox';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { AlertCircle, CheckCircle, Save, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, Save, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { allSubcategories, SubcategoryType } from '../lib/mockData';
 
 const DRAFT_KEY = 'connectify_event_draft';
+
+interface EventDate {
+  id: string;
+  startDate: string;
+  endDate: string;
+}
 
 export function EventSubmission() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -22,10 +29,11 @@ export function EventSubmission() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<SubcategoryType[]>([]);
+  const [eventDates, setEventDates] = useState<EventDate[]>([{ id: '1', startDate: '', endDate: '' }]);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
-    subcategory: '',
     organization: '',
     organizationWebsite: '',
     shortDescription: '',
@@ -33,18 +41,46 @@ export function EventSubmission() {
     requirements: '',
     benefits: '',
     capacity: '',
+    fee: '',
     targetAudience: '',
     eventType: '',
     address: '',
     virtualLink: '',
-    startDate: '',
-    endDate: '',
     deadline: ''
   });
   const navigate = useNavigate();
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
+
+  // Handle subcategory toggle
+  const handleSubcategoryToggle = (subcategory: SubcategoryType, checked: boolean) => {
+    if (checked) {
+      setSelectedSubcategories([...selectedSubcategories, subcategory]);
+    } else {
+      setSelectedSubcategories(selectedSubcategories.filter(s => s !== subcategory));
+    }
+  };
+
+  // Handle adding a new event date
+  const addEventDate = () => {
+    const newId = String(Date.now());
+    setEventDates([...eventDates, { id: newId, startDate: '', endDate: '' }]);
+  };
+
+  // Handle removing an event date
+  const removeEventDate = (id: string) => {
+    if (eventDates.length > 1) {
+      setEventDates(eventDates.filter(d => d.id !== id));
+    }
+  };
+
+  // Handle updating an event date
+  const updateEventDate = (id: string, field: 'startDate' | 'endDate', value: string) => {
+    setEventDates(eventDates.map(d => 
+      d.id === id ? { ...d, [field]: value } : d
+    ));
+  };
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -54,6 +90,12 @@ export function EventSubmission() {
         const parsed = JSON.parse(savedDraft);
         setFormData(parsed.formData);
         setCurrentStep(parsed.currentStep || 1);
+        if (parsed.selectedSubcategories) {
+          setSelectedSubcategories(parsed.selectedSubcategories);
+        }
+        if (parsed.eventDates && parsed.eventDates.length > 0) {
+          setEventDates(parsed.eventDates);
+        }
         toast.info('Draft restored', {
           description: 'Your previous draft has been loaded.',
         });
@@ -71,7 +113,7 @@ export function EventSubmission() {
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [formData, currentStep]);
+  }, [formData, currentStep, selectedSubcategories, eventDates]);
 
   const saveDraft = async (auto = false) => {
     setIsSaving(true);
@@ -81,6 +123,8 @@ export function EventSubmission() {
       localStorage.setItem(DRAFT_KEY, JSON.stringify({
         formData,
         currentStep,
+        selectedSubcategories,
+        eventDates,
         savedAt: new Date().toISOString()
       }));
       
@@ -115,9 +159,10 @@ export function EventSubmission() {
     }
     
     if (currentStep === 3) {
-      if (!formData.eventType || !formData.startDate || !formData.deadline) {
+      const hasValidDate = eventDates.some(d => d.startDate);
+      if (!formData.eventType || !hasValidDate || !formData.deadline) {
         toast.error('Please fill in required fields', {
-          description: 'Event type, start date, and deadline are required.',
+          description: 'Event type, at least one start date, and deadline are required.',
         });
         return;
       }
@@ -238,19 +283,45 @@ export function EventSubmission() {
                   </div>
 
                   <div>
-                    <Label htmlFor="subcategory">Subcategory (Optional)</Label>
-                    <Select value={formData.subcategory} onValueChange={(value) => setFormData({...formData, subcategory: value})}>
+                    <Label>Subcategories (Optional - Select multiple)</Label>
+                    <Select
+                      value={selectedSubcategories.length > 0 ? "selected" : ""}
+                      onValueChange={() => {}}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a subcategory" />
+                        <SelectValue placeholder="Select subcategories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="fun">Fun</SelectItem>
-                        <SelectItem value="technology">Technology</SelectItem>
-                        <SelectItem value="education">Education</SelectItem>
-                        <SelectItem value="etc">ETC</SelectItem>
+                        <div className="p-2 max-h-60 overflow-y-auto">
+                          {allSubcategories.map((subcategory) => (
+                            <div key={subcategory} className="flex items-center gap-2 py-1">
+                              <Checkbox
+                                id={`subcategory-${subcategory}`}
+                                checked={selectedSubcategories.includes(subcategory)}
+                                onCheckedChange={(checked) => handleSubcategoryToggle(subcategory, checked as boolean)}
+                              />
+                              <Label htmlFor={`subcategory-${subcategory}`} className="cursor-pointer text-sm">
+                                {subcategory}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
                       </SelectContent>
                     </Select>
+                    {selectedSubcategories.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {selectedSubcategories.map((subcategory) => (
+                          <Badge
+                            key={subcategory}
+                            variant="secondary"
+                            className="text-xs cursor-pointer hover:bg-gray-200"
+                            onClick={() => handleSubcategoryToggle(subcategory, false)}
+                          >
+                            {subcategory} <X className="h-3 w-3 ml-1" />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -341,6 +412,21 @@ export function EventSubmission() {
                     </div>
 
                     <div>
+                      <Label htmlFor="fee">Fee to Join (USD)</Label>
+                      <Input 
+                        id="fee" 
+                        type="number"
+                        min="0"
+                        placeholder="e.g., 0 for free, 25 for $25"
+                        value={formData.fee}
+                        onChange={(e) => setFormData({...formData, fee: e.target.value})}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Enter 0 for free events</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
                       <Label htmlFor="targetAudience">Target Audience</Label>
                       <Input 
                         id="targetAudience" 
@@ -400,26 +486,65 @@ export function EventSubmission() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="startDate">Start Date & Time *</Label>
-                      <Input 
-                        id="startDate" 
-                        type="datetime-local"
-                        value={formData.startDate}
-                        onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                      />
+                  {/* Multiple Event Dates */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Event Dates *</Label>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={addEventDate}
+                        className="gap-1"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Date
+                      </Button>
                     </div>
-
-                    <div>
-                      <Label htmlFor="endDate">End Date & Time *</Label>
-                      <Input 
-                        id="endDate" 
-                        type="datetime-local"
-                        value={formData.endDate}
-                        onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                      />
-                    </div>
+                    <p className="text-sm text-gray-500">
+                      Add multiple dates if your event spans multiple sessions or days.
+                    </p>
+                    
+                    {eventDates.map((eventDate, index) => (
+                      <div key={eventDate.id} className="p-4 border rounded-lg bg-gray-50 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-700">
+                            {eventDates.length > 1 ? `Session ${index + 1}` : 'Event Date'}
+                          </span>
+                          {eventDates.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeEventDate(eventDate.id)}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`startDate-${eventDate.id}`}>Start Date & Time *</Label>
+                            <Input 
+                              id={`startDate-${eventDate.id}`}
+                              type="datetime-local"
+                              value={eventDate.startDate}
+                              onChange={(e) => updateEventDate(eventDate.id, 'startDate', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`endDate-${eventDate.id}`}>End Date & Time</Label>
+                            <Input 
+                              id={`endDate-${eventDate.id}`}
+                              type="datetime-local"
+                              value={eventDate.endDate}
+                              onChange={(e) => updateEventDate(eventDate.id, 'endDate', e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div>
@@ -448,10 +573,15 @@ export function EventSubmission() {
 
                     <Card>
                       <CardContent className="pt-6">
-                        <div className="flex items-start gap-2 mb-3">
+                        <div className="flex flex-wrap items-start gap-2 mb-3">
                           <Badge className="bg-blue-100 text-blue-700">
                             {formData.category || 'Category'}
                           </Badge>
+                          {selectedSubcategories.map((sub) => (
+                            <Badge key={sub} variant="secondary" className="text-xs">
+                              {sub}
+                            </Badge>
+                          ))}
                           <Badge variant="outline" className="text-blue-600 border-blue-600 gap-1">
                             <AlertCircle className="h-3 w-3" />
                             Pending Review
@@ -462,6 +592,28 @@ export function EventSubmission() {
                         <p className="text-gray-700 text-sm line-clamp-3">
                           {formData.shortDescription || 'Your short description will appear here...'}
                         </p>
+                        <div className="mt-3 pt-3 border-t flex items-center gap-4 text-sm">
+                          <span className={formData.fee === '0' || formData.fee === '' ? 'text-green-600 font-medium' : ''}>
+                            Fee: {formData.fee === '0' || formData.fee === '' ? 'Free' : `$${formData.fee}`}
+                          </span>
+                          {formData.capacity && (
+                            <span className="text-gray-600">Capacity: {formData.capacity}</span>
+                          )}
+                        </div>
+                        {eventDates.length > 0 && eventDates.some(d => d.startDate) && (
+                          <div className="mt-3 pt-3 border-t">
+                            <p className="text-sm text-gray-600 font-medium mb-1">Event Dates:</p>
+                            <div className="space-y-1">
+                              {eventDates.filter(d => d.startDate).map((date, idx) => (
+                                <p key={date.id} className="text-sm text-gray-700">
+                                  {eventDates.length > 1 ? `Session ${idx + 1}: ` : ''}
+                                  {new Date(date.startDate).toLocaleString()}
+                                  {date.endDate && ` - ${new Date(date.endDate).toLocaleString()}`}
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
