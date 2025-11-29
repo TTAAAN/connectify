@@ -1,5 +1,21 @@
 // Mock data for Connectify platform
 
+export type SubcategoryType =
+  | "Fun"
+  | "Technology"
+  | "Education"
+  | "Health"
+  | "Environment"
+  | "Arts"
+  | "Sports"
+  | "Business"
+  | "Social Impact"
+  | "Research"
+  | "Leadership"
+  | "Networking"
+  | "Career Development"
+  | "ETC";
+
 export interface Opportunity {
   id: string;
   title: string;
@@ -12,7 +28,8 @@ export interface Opportunity {
     | "Internships"
     | "Jobs"
     | "Events";
-  subcategory?: "Fun" | "Technology" | "Education" | "ETC";
+  subcategory?: SubcategoryType;
+  subcategories?: SubcategoryType[];
   verified: boolean;
   verifiedDate?: string;
   isPartnered?: boolean;
@@ -58,6 +75,23 @@ export interface FlaggedContent {
   status: "New" | "In Progress" | "Resolved";
 }
 
+export const allSubcategories: SubcategoryType[] = [
+  "Fun",
+  "Technology",
+  "Education",
+  "Health",
+  "Environment",
+  "Arts",
+  "Sports",
+  "Business",
+  "Social Impact",
+  "Research",
+  "Leadership",
+  "Networking",
+  "Career Development",
+  "ETC",
+];
+
 export const mockOpportunities: Opportunity[] = [
   {
     id: "1",
@@ -65,6 +99,7 @@ export const mockOpportunities: Opportunity[] = [
     organization: "Green Earth Initiative Cambodia",
     category: "Volunteering",
     subcategory: "Fun",
+    subcategories: ["Fun", "Environment", "Health", "Social Impact", "Education"],
     verified: true,
     verifiedDate: "2025-11-10",
     location: "Phnom Penh, Cambodia",
@@ -99,6 +134,7 @@ export const mockOpportunities: Opportunity[] = [
     organization: "Design Academy Cambodia",
     category: "Workshops",
     subcategory: "Technology",
+    subcategories: ["Technology", "Arts", "Career Development", "Networking", "Education", "Business"],
     verified: true,
     verifiedDate: "2025-11-12",
     isPartnered: true,
@@ -134,6 +170,7 @@ export const mockOpportunities: Opportunity[] = [
     organization: "TechHub Siem Reap",
     category: "Competitions",
     subcategory: "Technology",
+    subcategories: ["Technology", "Research", "Networking", "Career Development"],
     verified: true,
     verifiedDate: "2025-11-08",
     isPartnered: true,
@@ -169,6 +206,7 @@ export const mockOpportunities: Opportunity[] = [
     organization: "CloudTech Cambodia",
     category: "Internships",
     subcategory: "Technology",
+    subcategories: ["Technology", "Career Development", "Education", "Business", "Research", "Networking", "Leadership"],
     verified: true,
     verifiedDate: "2025-11-15",
     location: "Battambang, Cambodia",
@@ -202,6 +240,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Junior Frontend Developer",
     organization: "StartupXYZ Cambodia",
     category: "Jobs",
+    subcategories: ["Technology", "Career Development", "Business"],
     verified: false,
     location: "Remote",
     isRemote: true,
@@ -236,6 +275,7 @@ export const mockOpportunities: Opportunity[] = [
     organization: "University Career Center",
     category: "Events",
     subcategory: "Education",
+    subcategories: ["Education", "Career Development", "Networking", "Technology", "Business"],
     verified: true,
     verifiedDate: "2025-11-11",
     location: "Kampong Cham, Cambodia",
@@ -270,6 +310,7 @@ export const mockOpportunities: Opportunity[] = [
     organization: "Learning Hub",
     category: "Workshops",
     subcategory: "Education",
+    subcategories: ["Education", "Technology", "Research", "Career Development"],
     verified: true,
     verifiedDate: "2025-11-14",
     location: "Sihanoukville, Cambodia",
@@ -303,6 +344,7 @@ export const mockOpportunities: Opportunity[] = [
     title: "Environmental Research Assistant",
     organization: "Ocean Conservation Lab",
     category: "Internships",
+    subcategories: ["Environment", "Research", "Health", "Education", "Social Impact"],
     verified: false,
     location: "Kep, Cambodia",
     isRemote: false,

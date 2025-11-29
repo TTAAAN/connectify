@@ -11,6 +11,8 @@ interface OpportunityCardProps {
   opportunity: Opportunity;
 }
 
+const MAX_VISIBLE_SUBCATEGORIES = 3;
+
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   
@@ -39,20 +41,18 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     }
   };
 
+  // Get subcategories to display with overflow indicator
+  const subcategories = opportunity.subcategories || (opportunity.subcategory ? [opportunity.subcategory] : []);
+  const visibleSubcategories = subcategories.slice(0, MAX_VISIBLE_SUBCATEGORIES);
+  const hiddenCount = subcategories.length - MAX_VISIBLE_SUBCATEGORIES;
+
   return (
     <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
       <CardHeader>
         <div className="flex items-start justify-between gap-2 mb-2">
-          <div className="flex flex-wrap gap-1">
-            <Badge className={categoryColors[opportunity.category]}>
-              {opportunity.category}
-            </Badge>
-            {opportunity.subcategory && (
-              <Badge variant="outline" className="text-gray-600">
-                {opportunity.subcategory}
-              </Badge>
-            )}
-          </div>
+          <Badge className={categoryColors[opportunity.category]}>
+            {opportunity.category}
+          </Badge>
           {opportunity.isPartnered ? (
             <Badge className="bg-slate-700 text-white flex items-center gap-1">
               <Building2 className="h-3 w-3" />
@@ -65,6 +65,22 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             </Badge>
           )}
         </div>
+        {/* Subcategories on separate line */}
+        {subcategories.length > 0 && (
+          <div className="flex items-center flex-wrap gap-1 mb-2">
+            <span className="text-xs text-gray-500 mr-1">Subcategories:</span>
+            {visibleSubcategories.map((sub, index) => (
+              <Badge key={index} variant="outline" className="text-gray-600 text-xs">
+                {sub}
+              </Badge>
+            ))}
+            {hiddenCount > 0 && (
+              <Badge variant="outline" className="text-blue-600 bg-blue-50 text-xs">
+                +{hiddenCount}
+              </Badge>
+            )}
+          </div>
+        )}
         <h3 className="text-xl">{opportunity.title}</h3>
         <p className="text-gray-600">{opportunity.organization}</p>
       </CardHeader>

@@ -10,10 +10,20 @@ import { OpportunityCard } from '../components/OpportunityCard';
 import { mockOpportunities } from '../lib/mockData';
 import { toast } from 'sonner';
 import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../components/ui/dialog';
+import { 
   MapPin, Calendar, Clock, Users, Mail, Globe, 
   Bookmark, Share2, Flag, CheckCircle, AlertCircle,
-  ChevronRight, ExternalLink, Building2, User, Loader2
+  ChevronRight, ExternalLink, Building2, User, Loader2, Tag
 } from 'lucide-react';
+
+const MAX_VISIBLE_SUBCATEGORIES = 3;
 
 export function OpportunityDetail() {
   const { id } = useParams();
@@ -26,6 +36,11 @@ export function OpportunityDetail() {
   if (!opportunity) {
     return <div>Opportunity not found</div>;
   }
+
+  // Get subcategories 
+  const subcategories = opportunity.subcategories || (opportunity.subcategory ? [opportunity.subcategory] : []);
+  const visibleSubcategories = subcategories.slice(0, MAX_VISIBLE_SUBCATEGORIES);
+  const hiddenCount = subcategories.length - MAX_VISIBLE_SUBCATEGORIES;
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
@@ -135,41 +150,111 @@ export function OpportunityDetail() {
                   {opportunity.organization.charAt(0)}
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-start justify-between gap-4 mb-2">
+                    {/* Left side: Category */}
                     <Badge className={categoryColors[opportunity.category]}>
                       {opportunity.category}
                     </Badge>
-                    {opportunity.subcategory && (
-                      <Badge variant="outline" className="text-gray-600">
-                        {opportunity.subcategory}
-                      </Badge>
-                    )}
                     
-                    {opportunity.isPartnered ? (
-                      <Badge className="bg-slate-700 text-white gap-1">
-                        <Building2 className="h-3 w-3" />
-                        Partnered Organization
-                      </Badge>
-                    ) : (
-                      <>
-                        <Badge className="bg-slate-100 text-slate-700 gap-1">
-                          <User className="h-3 w-3" />
-                          User
+                    {/* Right side: User/Verified/Partnered badges */}
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      {opportunity.isPartnered ? (
+                        <Badge className="bg-slate-700 text-white gap-1">
+                          <Building2 className="h-3 w-3" />
+                          Partnered Organization
                         </Badge>
-                        {opportunity.verified ? (
-                          <Badge className="bg-blue-50 text-blue-700 gap-1">
-                            <CheckCircle className="h-3 w-3" />
-                            Verified by Admin
+                      ) : (
+                        <>
+                          <Badge className="bg-slate-100 text-slate-700 gap-1">
+                            <User className="h-3 w-3" />
+                            User
                           </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-blue-600 border-blue-600 gap-1">
-                            <Clock className="h-3 w-3" />
-                            Pending Verification
-                          </Badge>
-                        )}
-                      </>
-                    )}
+                          {opportunity.verified ? (
+                            <Badge className="bg-blue-50 text-blue-700 gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              Verified by Admin
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-blue-600 border-blue-600 gap-1">
+                              <Clock className="h-3 w-3" />
+                              Pending Verification
+                            </Badge>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
+                  
+                  {/* Subcategories on separate line */}
+                  {subcategories.length > 0 && (
+                    <div className="flex items-center flex-wrap gap-2 mb-3">
+                      <span className="text-sm text-gray-500">Subcategories:</span>
+                      {visibleSubcategories.map((sub, index) => (
+                        <Badge key={index} variant="outline" className="text-gray-600">
+                          {sub}
+                        </Badge>
+                      ))}
+                      {hiddenCount > 0 && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Badge 
+                              variant="outline" 
+                              className="text-blue-600 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors"
+                            >
+                              +{hiddenCount} more
+                            </Badge>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle className="flex items-center gap-2">
+                                <Tag className="h-5 w-5" />
+                                All Subcategories
+                              </DialogTitle>
+                              <DialogDescription>
+                                This opportunity is tagged with the following subcategories:
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {subcategories.map((sub, index) => (
+                                <Badge key={index} variant="outline" className="text-gray-700 py-1 px-3">
+                                  {sub}
+                                </Badge>
+                              ))}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                      {/* Button to view all subcategories even if no overflow */}
+                      {subcategories.length > 0 && hiddenCount <= 0 && subcategories.length >= 2 && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-blue-600 h-6 px-2 text-xs">
+                              View all
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle className="flex items-center gap-2">
+                                <Tag className="h-5 w-5" />
+                                All Subcategories
+                              </DialogTitle>
+                              <DialogDescription>
+                                This opportunity is tagged with the following subcategories:
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {subcategories.map((sub, index) => (
+                                <Badge key={index} variant="outline" className="text-gray-700 py-1 px-3">
+                                  {sub}
+                                </Badge>
+                              ))}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                    </div>
+                  )}
+                  
                   <h1 className="text-4xl mb-2">{opportunity.title}</h1>
                   <p className="text-xl text-gray-600">{opportunity.organization}</p>
                 </div>
