@@ -25,59 +25,59 @@ export function SavedOpportunities() {
     <div className="min-h-screen bg-gray-50">
       <Header isAuthenticated />
 
-      <div className="container mx-auto px-8 py-12">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-3">Saved Opportunities</h1>
-          <p className="text-gray-600 text-lg">Your bookmarked opportunities for quick access</p>
+      <div className="container mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl mb-2">Saved Opportunities</h1>
+          <p className="text-gray-600">Your bookmarked opportunities for quick access</p>
         </div>
 
-        <Card className="shadow-md">
-          <CardContent className="p-10">
-            <div className="flex items-center justify-between mb-10">
-              <h3 className="text-2xl font-semibold">Your Saved Items</h3>
-              <Badge variant="outline" className="text-blue-600 px-4 py-2 text-sm">{savedOpportunities.length} saved</Badge>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold">Your Saved Items</h3>
+              <Badge variant="outline" className="text-blue-600">{savedOpportunities.length} saved</Badge>
             </div>
             
             {savedOpportunities.length > 0 ? (
-              <div className="space-y-8">
+              <div className="space-y-4">
                 {savedOpportunities.map((opportunity) => (
                   <div 
                     key={opportunity.id} 
-                    className="border rounded-xl p-8 flex items-center justify-between hover:shadow-lg transition-all hover:border-blue-300 bg-white"
+                    className="border rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all hover:border-blue-200 bg-white"
                   >
-                    <div className="flex-1 pr-8">
-                      <div className="flex items-center gap-4 mb-4">
-                        <Badge className="bg-blue-100 text-blue-700 px-3 py-1">{opportunity.category}</Badge>
-                        <h4 className="text-xl font-semibold">{opportunity.title}</h4>
+                    <div className="flex-1 pr-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-blue-100 text-blue-700">{opportunity.category}</Badge>
+                        <h4 className="font-medium">{opportunity.title}</h4>
                         {opportunity.verified && (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <CheckCircle className="h-4 w-4 text-green-500" />
                         )}
                       </div>
-                      <p className="text-gray-600 mb-5 text-base">{opportunity.organization}</p>
-                      <div className="flex items-center gap-10 text-sm text-gray-500">
-                        <span className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
+                      <p className="text-sm text-gray-600 mb-2">{opportunity.organization}</p>
+                      <div className="flex items-center gap-6 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
                           {opportunity.location}
                         </span>
-                        <span className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
                           {new Date(opportunity.date).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-3">
                       <Button 
                         variant="outline" 
-                        size="lg"
+                        size="sm"
                         className="text-gray-500 hover:text-red-600 hover:border-red-200"
                         onClick={() => handleRemoveSaved(opportunity.id, opportunity.title)}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        <Trash2 className="h-4 w-4 mr-1" />
                         Remove
                       </Button>
                       <Link to={`/opportunity/${opportunity.id}`}>
-                        <Button className="bg-blue-600 hover:bg-blue-700" size="lg">
-                          <ExternalLink className="h-4 w-4 mr-2" />
+                        <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
+                          <ExternalLink className="h-4 w-4 mr-1" />
                           View Details
                         </Button>
                       </Link>
@@ -86,14 +86,14 @@ export function SavedOpportunities() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20">
-                <Bookmark className="h-20 w-20 mx-auto text-gray-300 mb-8" />
-                <h4 className="text-2xl text-gray-700 mb-4">No saved opportunities</h4>
-                <p className="text-gray-500 mb-8 max-w-md mx-auto text-lg">
+              <div className="text-center py-12">
+                <Bookmark className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                <h4 className="text-xl text-gray-700 mb-2">No saved opportunities</h4>
+                <p className="text-gray-500 mb-6 max-w-md mx-auto">
                   Start exploring and save opportunities you're interested in to access them quickly later
                 </p>
                 <Link to="/opportunities">
-                  <Button className="bg-blue-600 hover:bg-blue-700" size="lg">
+                  <Button className="bg-blue-600 hover:bg-blue-700">
                     <Search className="h-4 w-4 mr-2" />
                     Browse Opportunities
                   </Button>
