@@ -280,57 +280,137 @@ const subcategoryMapping: Record<Opportunity["category"], SubcategoryType[][]> =
   ],
 };
 
-// Seeded random number generator for consistent mock data
+// Seeded random number generator for consistent mock data with better distribution
 function seededRandom(seed: number) {
-  const x = Math.sin(seed++) * 10000;
-  return x - Math.floor(x);
+  // Use a linear congruential generator for better distribution
+  const a = 1664525;
+  const c = 1013904223;
+  const m = Math.pow(2, 32);
+  seed = (a * seed + c) % m;
+  return seed / m;
 }
+
+// Create a random generator with state that advances on each call
+function createRandomGenerator(initialSeed: number) {
+  let state = initialSeed;
+  return () => {
+    state = (1664525 * state + 1013904223) % Math.pow(2, 32);
+    return state / Math.pow(2, 32);
+  };
+}
+
+// Additional title modifiers for more variety
+const titleModifiers = [
+  "2025", "Spring", "Summer", "Fall", "Winter", "Annual", "Monthly", "Weekly",
+  "Special", "Exclusive", "Premium", "Free", "Virtual", "Hybrid", "Global"
+];
+
+// More diverse requirements
+const requirementOptions = [
+  ["Relevant experience or interest in the field", "Strong communication skills", "Team collaboration abilities"],
+  ["Bachelor's degree or equivalent experience", "Problem-solving skills", "Self-motivated learner"],
+  ["Passion for the subject matter", "Basic computer literacy", "Flexible schedule availability"],
+  ["Strong analytical abilities", "Detail-oriented mindset", "Time management skills"],
+  ["Creative thinking capabilities", "Adaptability to change", "Enthusiasm for learning"],
+  ["Prior volunteer experience preferred", "Cultural awareness", "Patience and empathy"],
+  ["Technical proficiency", "Project management skills", "Leadership potential"],
+  ["Research background", "Data analysis skills", "Academic writing abilities"],
+];
+
+// More diverse benefits
+const benefitOptions = [
+  ["Gain valuable hands-on experience", "Build professional network", "Certificate of completion"],
+  ["Mentorship from industry experts", "Career guidance sessions", "Portfolio development"],
+  ["Skill enhancement workshops", "Reference letters", "Job placement assistance"],
+  ["Networking with peers", "Access to exclusive resources", "Professional development credits"],
+  ["Real-world project experience", "Industry exposure", "Resume building"],
+  ["Leadership development", "Community impact", "Personal growth opportunities"],
+  ["Technical skill advancement", "Cross-functional exposure", "Innovation workshops"],
+  ["Research publication opportunities", "Conference participation", "Academic credits"],
+];
+
+// More diverse descriptions templates
+const descriptionTemplates = [
+  (cat: string, subcats: string[], org: string) => 
+    `Join ${org} for an exciting ${cat.toLowerCase()} opportunity! This program focuses on ${subcats.slice(0, 2).join(" and ").toLowerCase()}, offering participants a unique chance to grow professionally.`,
+  (cat: string, subcats: string[], org: string) => 
+    `${org} is seeking motivated individuals for this ${cat.toLowerCase()} program. Participants will explore ${subcats.slice(0, 3).join(", ").toLowerCase()} while developing valuable skills.`,
+  (cat: string, subcats: string[], org: string) => 
+    `Don't miss this ${cat.toLowerCase()} opportunity with ${org}! Ideal for those interested in ${subcats.slice(0, 2).join(" and ").toLowerCase()}. Apply now to be part of something meaningful.`,
+  (cat: string, subcats: string[], org: string) => 
+    `${org} presents a comprehensive ${cat.toLowerCase()} experience. Focus areas include ${subcats.slice(0, 3).join(", ").toLowerCase()}. Perfect for passionate individuals looking to make an impact.`,
+  (cat: string, subcats: string[], org: string) => 
+    `Discover new possibilities with ${org}'s ${cat.toLowerCase()} program! We're looking for enthusiastic participants interested in ${subcats.slice(0, 2).join(" and ").toLowerCase()}.`,
+];
 
 function generateMockOpportunities(count: number): Opportunity[] {
   const opportunities: Opportunity[] = [];
 
   for (let i = 1; i <= count; i++) {
-    const seed = i * 12345;
-    const random = () => seededRandom(seed + opportunities.length);
+    // Use different seeds for different properties to ensure variety
+    const baseSeed = i * 31337 + 42;
+    const random = createRandomGenerator(baseSeed);
     
-    const category = categories[Math.floor(random() * categories.length)];
-    const locationData = cambodiaLocations[Math.floor(random() * cambodiaLocations.length)];
+    // Use prime number multipliers for different property selections
+    const categoryRandom = createRandomGenerator(baseSeed * 7);
+    const locationRandom = createRandomGenerator(baseSeed * 11);
+    const titleRandom = createRandomGenerator(baseSeed * 13);
+    const orgRandom = createRandomGenerator(baseSeed * 17);
+    const dateRandom = createRandomGenerator(baseSeed * 19);
+    const statusRandom = createRandomGenerator(baseSeed * 23);
+    
+    const category = categories[Math.floor(categoryRandom() * categories.length)];
+    const locationData = cambodiaLocations[Math.floor(locationRandom() * cambodiaLocations.length)];
     const isRemote = 'isRemote' in locationData && locationData.isRemote === true;
     
-    const titlePrefix = titlePrefixes[Math.floor(random() * titlePrefixes.length)];
-    const titleSuffix = titleSuffixes[category][Math.floor(random() * titleSuffixes[category].length)];
+    const titlePrefix = titlePrefixes[Math.floor(titleRandom() * titlePrefixes.length)];
+    const titleSuffix = titleSuffixes[category][Math.floor(titleRandom() * titleSuffixes[category].length)];
+    const titleModifier = titleRandom() > 0.5 ? titleModifiers[Math.floor(titleRandom() * titleModifiers.length)] : "";
     const subcategoriesOptions = subcategoryMapping[category];
     const selectedSubcategories = subcategoriesOptions[Math.floor(random() * subcategoriesOptions.length)];
-    const organization = organizations[Math.floor(random() * organizations.length)];
+    const organization = organizations[Math.floor(orgRandom() * organizations.length)];
     
-    // Add larger coordinate variance to spread markers within cities (approx 10-15km radius)
-    // Use different random calls for lat and lng to get varied positions
-    const latVariance = (seededRandom(seed + i * 7) - 0.5) * 0.15;
-    const lngVariance = (seededRandom(seed + i * 13) - 0.5) * 0.15;
+    // Add coordinate variance for map distribution
+    const latVariance = (locationRandom() - 0.5) * 0.2;
+    const lngVariance = (locationRandom() - 0.5) * 0.2;
     
     const verified = random() > 0.3;
+    
+    // More varied date distribution
     const baseDate = new Date("2025-11-01");
-    const dateOffset = Math.floor(random() * 120);
+    const dateOffset = Math.floor(dateRandom() * 150) - 30; // Some dates before, some after
     const opportunityDate = new Date(baseDate);
     opportunityDate.setDate(opportunityDate.getDate() + dateOffset);
     
-    const deadlineOffset = Math.floor(random() * 30);
+    const deadlineOffset = Math.floor(dateRandom() * 45) + 5; // 5-50 days before event
     const deadlineDate = new Date(opportunityDate);
     deadlineDate.setDate(deadlineDate.getDate() - deadlineOffset);
     
-    const postedOffset = Math.floor(random() * 60);
+    const postedOffset = Math.floor(dateRandom() * 90); // Up to 90 days ago
     const postedDate = new Date(baseDate);
     postedDate.setDate(postedDate.getDate() - postedOffset);
 
     const statuses: Opportunity["status"][] = ["Open", "Closed", "Full"];
-    const status = statuses[Math.floor(random() * 10) < 7 ? 0 : Math.floor(random() * 3)];
+    const statusProb = statusRandom();
+    const status = statusProb < 0.7 ? "Open" : statusProb < 0.85 ? "Closed" : "Full";
 
     // Generate organization domain for contact/website
-    const orgDomain = organization.toLowerCase().replace(/\s+/g, "");
+    const orgDomain = organization.toLowerCase().replace(/\s+/g, "").replace(/&/g, "and");
+
+    // Select varied requirements and benefits
+    const requirementIdx = Math.floor(random() * requirementOptions.length);
+    const benefitIdx = Math.floor(random() * benefitOptions.length);
+    const descriptionIdx = Math.floor(random() * descriptionTemplates.length);
+
+    // Create title with optional modifier and unique number
+    const titleNumber = Math.floor(titleRandom() * 1000);
+    const title = titleModifier 
+      ? `${titlePrefix} ${titleModifier} ${titleSuffix} ${titleNumber}`
+      : `${titlePrefix} ${titleSuffix} ${titleNumber}`;
 
     opportunities.push({
       id: String(i),
-      title: `${titlePrefix} ${titleSuffix} ${Math.floor(random() * 100)}`,
+      title,
       organization,
       category,
       subcategory: selectedSubcategories[0],
@@ -342,19 +422,11 @@ function generateMockOpportunities(count: number): Opportunity[] {
       isRemote,
       date: opportunityDate.toISOString().split("T")[0],
       deadline: deadlineDate.toISOString().split("T")[0],
-      description: `This is a ${category.toLowerCase()} opportunity focused on ${selectedSubcategories.slice(0, 3).join(", ").toLowerCase()}. Join ${organization} for this exciting opportunity.`,
-      requirements: [
-        "Relevant experience or interest",
-        "Good communication skills",
-        "Ability to work in a team",
-      ],
-      benefits: [
-        "Gain valuable experience",
-        "Networking opportunities",
-        "Certificate of participation",
-      ],
+      description: descriptionTemplates[descriptionIdx](category, selectedSubcategories, organization),
+      requirements: requirementOptions[requirementIdx],
+      benefits: benefitOptions[benefitIdx],
       status,
-      capacity: String(Math.floor(random() * 100) + 10),
+      capacity: String(Math.floor(random() * 200) + 5),
       postedDate: postedDate.toISOString().split("T")[0],
       lastUpdated: postedDate.toISOString().split("T")[0],
       contact: `contact@${orgDomain}.org`,
@@ -363,8 +435,8 @@ function generateMockOpportunities(count: number): Opportunity[] {
         lat: locationData.lat + latVariance,
         lng: locationData.lng + lngVariance,
       },
-      views: Math.floor(random() * 2000) + 100,
-      applications: Math.floor(random() * 200) + 5,
+      views: Math.floor(random() * 5000) + 50,
+      applications: Math.floor(random() * 500) + 1,
     });
   }
 
