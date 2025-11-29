@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -11,10 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../components/ui/checkbox';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { AlertCircle, CheckCircle, Save } from 'lucide-react';
+import { AlertCircle, CheckCircle, Save, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+const DRAFT_KEY = 'connectify_event_draft';
 
 export function EventSubmission() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -38,9 +45,76 @@ export function EventSubmission() {
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        setFormData(parsed.formData);
+        setCurrentStep(parsed.currentStep || 1);
+        toast.info('Draft restored', {
+          description: 'Your previous draft has been loaded.',
+        });
+      } catch (e) {
+        console.error('Error loading draft:', e);
+      }
+    }
+  }, []);
+
+  // Auto-save draft every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (formData.title || formData.organization) {
+        saveDraft(true);
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [formData, currentStep]);
+
+  const saveDraft = async (auto = false) => {
+    setIsSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      formData,
+      currentStep,
+      savedAt: new Date().toISOString()
+    }));
+    
+    setLastSaved(new Date());
+    setIsSaving(false);
+    
+    if (!auto) {
+      toast.success('Draft saved!', {
+        description: 'Your progress has been saved locally.',
+      });
+    }
+  };
+
   const handleNext = () => {
+    // Validation for each step
+    if (currentStep === 1) {
+      if (!formData.title || !formData.category || !formData.organization) {
+        toast.error('Please fill in required fields', {
+          description: 'Title, Category, and Organization are required.',
+        });
+        return;
+      }
+    }
+    
+    if (currentStep === 3) {
+      if (!formData.eventType || !formData.startDate || !formData.deadline) {
+        toast.error('Please fill in required fields', {
+          description: 'Event type, start date, and deadline are required.',
+        });
+        return;
+      }
+    }
+
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+      saveDraft(true);
     }
   };
 
@@ -50,7 +124,25 @@ export function EventSubmission() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!isConfirmed) {
+      toast.error('Please confirm your submission', {
+        description: 'You must confirm that the information is accurate.',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Clear draft after successful submission
+    localStorage.removeItem(DRAFT_KEY);
+    
+    toast.success('Submission successful!', {
+      description: 'Your opportunity has been submitted for review.',
+    });
+    
+    setIsSubmitting(false);
     navigate('/submission-confirmation');
   };
 
@@ -367,7 +459,11 @@ export function EventSubmission() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Checkbox id="confirm" required />
+                    <Checkbox 
+                      id="confirm" 
+                      checked={isConfirmed}
+                      onCheckedChange={(checked) => setIsConfirmed(checked as boolean)}
+                    />
                     <Label htmlFor="confirm" className="cursor-pointer">
                       I confirm that this information is accurate and complete *
                     </Label>
@@ -380,14 +476,23 @@ export function EventSubmission() {
                 <Button 
                   variant="outline"
                   onClick={handlePrevious}
-                  disabled={currentStep === 1}
+                  disabled={currentStep === 1 || isSubmitting}
                 >
                   Previous
                 </Button>
 
-                <Button variant="ghost" className="gap-2">
-                  <Save className="h-4 w-4" />
-                  Save as Draft
+                <Button 
+                  variant="ghost" 
+                  className="gap-2"
+                  onClick={() => saveDraft()}
+                  disabled={isSaving || isSubmitting}
+                >
+                  {isSaving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {isSaving ? 'Saving...' : 'Save as Draft'}
                 </Button>
 
                 {currentStep < totalSteps ? (
@@ -401,8 +506,16 @@ export function EventSubmission() {
                   <Button 
                     onClick={handleSubmit}
                     className="bg-blue-600 hover:bg-blue-700"
+                    disabled={isSubmitting}
                   >
-                    Submit for Review
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit for Review'
+                    )}
                   </Button>
                 )}
               </div>
@@ -411,8 +524,22 @@ export function EventSubmission() {
 
           {/* Auto-save Indicator */}
           <div className="text-center mt-4 text-sm text-gray-500">
-            <CheckCircle className="h-4 w-4 inline mr-1" />
-            Changes auto-saved
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 inline mr-1 animate-spin" />
+                Saving...
+              </>
+            ) : lastSaved ? (
+              <>
+                <CheckCircle className="h-4 w-4 inline mr-1 text-green-500" />
+                Last saved {lastSaved.toLocaleTimeString()}
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4 inline mr-1" />
+                Changes will auto-save
+              </>
+            )}
           </div>
         </div>
       </div>

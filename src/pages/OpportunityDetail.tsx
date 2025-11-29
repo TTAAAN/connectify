@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -7,20 +8,79 @@ import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
 import { OpportunityCard } from '../components/OpportunityCard';
 import { mockOpportunities } from '../lib/mockData';
+import { toast } from 'sonner';
 import { 
   MapPin, Calendar, Clock, Users, Mail, Globe, 
   Bookmark, Share2, Flag, CheckCircle, AlertCircle,
-  ChevronRight, ExternalLink, Building2, User
+  ChevronRight, ExternalLink, Building2, User, Loader2
 } from 'lucide-react';
 
 export function OpportunityDetail() {
   const { id } = useParams();
   const opportunity = mockOpportunities.find(o => o.id === id);
   const similarOpportunities = mockOpportunities.filter(o => o.id !== id && o.category === opportunity?.category).slice(0, 3);
+  
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
   if (!opportunity) {
     return <div>Opportunity not found</div>;
   }
+
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+    if (!isBookmarked) {
+      toast.success('Opportunity saved!', {
+        description: `${opportunity.title} has been added to your saved items.`,
+      });
+    } else {
+      toast.info('Removed from saved', {
+        description: `${opportunity.title} has been removed from your saved items.`,
+      });
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: opportunity.title,
+          text: `Check out this opportunity: ${opportunity.title} at ${opportunity.organization}`,
+          url: url,
+        });
+        toast.success('Shared successfully!');
+      } catch (err) {
+        // User cancelled or share failed, copy to clipboard instead
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied to clipboard!', {
+          description: 'Share this link with others.',
+        });
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied to clipboard!', {
+        description: 'Share this link with others.',
+      });
+    }
+  };
+
+  const handleReport = () => {
+    toast.info('Report submitted', {
+      description: 'Thank you for your report. Our team will review this listing.',
+    });
+  };
+
+  const handleApply = async () => {
+    setIsApplying(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsApplying(false);
+    toast.success('Application submitted!', {
+      description: `Your application for ${opportunity.title} has been sent to ${opportunity.organization}.`,
+    });
+  };
 
   const categoryColors: Record<string, string> = {
     'Volunteering': 'bg-sky-100 text-sky-700',
@@ -94,19 +154,32 @@ export function OpportunityDetail() {
                 <Button 
                   size="lg" 
                   className="bg-blue-600 hover:bg-blue-700"
-                  disabled={!opportunity.isPartnered && !opportunity.verified}
+                  disabled={(!opportunity.isPartnered && !opportunity.verified) || isApplying}
+                  onClick={handleApply}
                 >
-                  {(opportunity.isPartnered || opportunity.verified) ? 'Apply Now' : 'Pending Verification'}
+                  {isApplying ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Applying...
+                    </>
+                  ) : (
+                    (opportunity.isPartnered || opportunity.verified) ? 'Apply Now' : 'Pending Verification'
+                  )}
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Bookmark className="h-5 w-5 mr-2" />
-                  Save
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={handleBookmark}
+                  className={isBookmarked ? 'bg-blue-50 border-blue-200' : ''}
+                >
+                  <Bookmark className={`h-5 w-5 mr-2 ${isBookmarked ? 'fill-blue-600 text-blue-600' : ''}`} />
+                  {isBookmarked ? 'Saved' : 'Save'}
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={handleShare}>
                   <Share2 className="h-5 w-5 mr-2" />
                   Share
                 </Button>
-                <Button variant="ghost" size="lg" className="ml-auto">
+                <Button variant="ghost" size="lg" className="ml-auto text-gray-500 hover:text-red-600" onClick={handleReport}>
                   <Flag className="h-5 w-5 mr-2" />
                   Report
                 </Button>

@@ -1,11 +1,12 @@
 import { Bell, Search, User, Shield, Clock, CheckCircle, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { useState, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface HeaderProps {
   isAuthenticated?: boolean;
@@ -49,8 +50,10 @@ const mockNotifications: Notification[] = [
 ];
 
 export function Header({ isAuthenticated = false, isAdmin = false }: HeaderProps) {
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [searchQuery, setSearchQuery] = useState('');
   const notificationRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -75,14 +78,27 @@ export function Header({ isAuthenticated = false, isAdmin = false }: HeaderProps
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
+    toast.success('Notification marked as read');
   };
 
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    toast.success('All notifications marked as read');
   };
 
   const deleteNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
+    toast.info('Notification deleted');
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/opportunities?search=${encodeURIComponent(searchQuery.trim())}`);
+      toast.info(`Searching for "${searchQuery.trim()}"`, {
+        description: 'Redirecting to search results...',
+      });
+    }
   };
 
   return (
@@ -119,13 +135,15 @@ export function Header({ isAuthenticated = false, isAdmin = false }: HeaderProps
 
           {/* Search Bar (for authenticated users) */}
           {isAuthenticated && !isAdmin && (
-            <div className="flex-1 max-w-md relative">
+            <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input 
                 placeholder="Search opportunities..." 
                 className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </form>
           )}
 
           {/* Right Side Actions */}

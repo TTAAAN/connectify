@@ -20,6 +20,7 @@ import { AdminReviewDetail } from './pages/AdminReviewDetail';
 import { AdminManageOpportunities } from './pages/AdminManageOpportunities';
 import { AdminFlaggedContent } from './pages/AdminFlaggedContent';
 import { AdminAnalytics } from './pages/AdminAnalytics';
+import { AdminUserManagement } from './pages/AdminUserManagement';
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/admin/manage" element={<AdminManageOpportunities />} />
         <Route path="/admin/flagged" element={<AdminFlaggedContent />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/users" element={<AdminUserManagement />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

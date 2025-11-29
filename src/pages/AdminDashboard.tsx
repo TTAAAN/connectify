@@ -197,15 +197,17 @@ export function AdminDashboard() {
                     </Card>
                   </Link>
 
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-br from-cyan-50 to-cyan-100">
-                    <CardContent className="pt-6 text-center">
-                      <div className="w-12 h-12 bg-cyan-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <Users className="h-6 w-6 text-white" />
-                      </div>
-                      <h4 className="mb-1">User Management</h4>
-                      <p className="text-sm text-gray-600">10,234 users</p>
-                    </CardContent>
-                  </Card>
+                  <Link to="/admin/users">
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-br from-cyan-50 to-cyan-100">
+                      <CardContent className="pt-6 text-center">
+                        <div className="w-12 h-12 bg-cyan-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <Users className="h-6 w-6 text-white" />
+                        </div>
+                        <h4 className="mb-1">User Management</h4>
+                        <p className="text-sm text-gray-600">10,234 users</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
 
                   <Link to="/admin/analytics">
                     <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-br from-green-50 to-green-100">
