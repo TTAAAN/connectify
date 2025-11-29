@@ -20,7 +20,7 @@ import {
 import { 
   MapPin, Calendar, Clock, Users, Mail, Globe, 
   Bookmark, Share2, Flag, CheckCircle, AlertCircle,
-  ChevronRight, ExternalLink, Building2, User, Loader2, Tag, CalendarPlus
+  ChevronRight, ExternalLink, Building2, User, Loader2, Tag, CalendarPlus, DollarSign
 } from 'lucide-react';
 
 const MAX_VISIBLE_SUBCATEGORIES = 3;
@@ -430,6 +430,17 @@ export function OpportunityDetail() {
                     <div>
                       <div className="text-sm text-gray-600">Capacity</div>
                       <div>{opportunity.capacity} {opportunity.capacity !== 'Unlimited' ? 'spots' : ''}</div>
+                    </div>
+                  </div>
+
+                  {/* Fee */}
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="h-5 w-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <div className="text-sm text-gray-600">Fee to Join</div>
+                      <div className={opportunity.fee === 0 ? 'text-green-600 font-medium' : ''}>
+                        {opportunity.fee === 0 ? 'Free' : `$${opportunity.fee} USD`}
+                      </div>
                     </div>
                   </div>
 

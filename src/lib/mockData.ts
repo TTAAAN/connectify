@@ -42,6 +42,7 @@ export interface Opportunity {
   benefits: string[];
   status: "Open" | "Closed" | "Full";
   capacity: string;
+  fee: number; // Fee in USD, 0 means free
   postedDate: string;
   lastUpdated: string;
   contact: string;
@@ -408,6 +409,15 @@ function generateMockOpportunities(count: number): Opportunity[] {
       ? `${titlePrefix} ${titleModifier} ${titleSuffix} ${titleNumber}`
       : `${titlePrefix} ${titleSuffix} ${titleNumber}`;
 
+    // Generate fee - 40% free, 60% paid with varying amounts
+    const feeRandom = random();
+    let fee = 0;
+    if (feeRandom > 0.4) {
+      // Paid opportunities
+      const feeAmounts = [5, 10, 15, 20, 25, 30, 50, 75, 100, 150, 200];
+      fee = feeAmounts[Math.floor(random() * feeAmounts.length)];
+    }
+
     opportunities.push({
       id: String(i),
       title,
@@ -427,6 +437,7 @@ function generateMockOpportunities(count: number): Opportunity[] {
       benefits: benefitOptions[benefitIdx],
       status,
       capacity: String(Math.floor(random() * 200) + 5),
+      fee,
       postedDate: postedDate.toISOString().split("T")[0],
       lastUpdated: postedDate.toISOString().split("T")[0],
       contact: `contact@${orgDomain}.org`,

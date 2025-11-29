@@ -41,6 +41,7 @@ export function EventSubmission() {
     requirements: '',
     benefits: '',
     capacity: '',
+    fee: '',
     targetAudience: '',
     eventType: '',
     address: '',
@@ -411,6 +412,21 @@ export function EventSubmission() {
                     </div>
 
                     <div>
+                      <Label htmlFor="fee">Fee to Join (USD)</Label>
+                      <Input 
+                        id="fee" 
+                        type="number"
+                        min="0"
+                        placeholder="e.g., 0 for free, 25 for $25"
+                        value={formData.fee}
+                        onChange={(e) => setFormData({...formData, fee: e.target.value})}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Enter 0 for free events</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
                       <Label htmlFor="targetAudience">Target Audience</Label>
                       <Input 
                         id="targetAudience" 
@@ -576,6 +592,14 @@ export function EventSubmission() {
                         <p className="text-gray-700 text-sm line-clamp-3">
                           {formData.shortDescription || 'Your short description will appear here...'}
                         </p>
+                        <div className="mt-3 pt-3 border-t flex items-center gap-4 text-sm">
+                          <span className={formData.fee === '0' || formData.fee === '' ? 'text-green-600 font-medium' : ''}>
+                            Fee: {formData.fee === '0' || formData.fee === '' ? 'Free' : `$${formData.fee}`}
+                          </span>
+                          {formData.capacity && (
+                            <span className="text-gray-600">Capacity: {formData.capacity}</span>
+                          )}
+                        </div>
                         {eventDates.length > 0 && eventDates.some(d => d.startDate) && (
                           <div className="mt-3 pt-3 border-t">
                             <p className="text-sm text-gray-600 font-medium mb-1">Event Dates:</p>

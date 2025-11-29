@@ -29,6 +29,7 @@ export function OpportunitySearch() {
   const [sortBy, setSortBy] = useState<string>('relevance');
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
   const [hideExpired, setHideExpired] = useState<boolean>(true);
+  const [feeFilter, setFeeFilter] = useState<string>('all'); // 'all', 'free', 'paid'
 
   // Filter out unverified/pending opportunities - only show verified ones
   const verifiedOpportunities = useMemo(() => {
@@ -125,6 +126,7 @@ export function OpportunitySearch() {
     setSortBy('relevance');
     setSearchQuery('');
     setHideExpired(true);
+    setFeeFilter('all');
     toast.info('Filters reset', { description: 'All filters have been cleared.' });
   };
   
@@ -134,6 +136,15 @@ export function OpportunitySearch() {
     if (hideExpired && isDeadlinePassed(opportunity.deadline)) {
       return false;
     }
+    
+    // Fee filter
+    if (feeFilter === 'free' && opportunity.fee !== 0) {
+      return false;
+    }
+    if (feeFilter === 'paid' && opportunity.fee === 0) {
+      return false;
+    }
+    
     // Search query filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -442,6 +453,23 @@ export function OpportunitySearch() {
                       </Label>
                     </div>
                   </div>
+                </div>
+
+                <Separator className="my-6" />
+
+                {/* Fee Filter */}
+                <div className="mb-6">
+                  <h4 className="mb-3">Fee to Join</h4>
+                  <Select value={feeFilter} onValueChange={setFeeFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fee type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All (Free & Paid)</SelectItem>
+                      <SelectItem value="free">Free Only</SelectItem>
+                      <SelectItem value="paid">Paid Only</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Separator className="my-6" />
