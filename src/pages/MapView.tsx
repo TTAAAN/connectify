@@ -1,19 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
-import { mockOpportunities } from '../lib/mockData';
+import { mockOpportunities, uniqueLocations, allSubcategories, SubcategoryType } from '../lib/mockData';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon, LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
   MapPin, Search, Layers, Locate,
-  ChevronLeft, ChevronRight, Calendar
+  ChevronLeft, ChevronRight, Calendar, Filter, X
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 
 // Fix for default marker icon in Leaflet with webpack/vite
 const defaultIcon = new Icon({
@@ -54,12 +61,18 @@ function MapController({ center }: { center: LatLngExpression }) {
   return null;
 }
 
+const ITEMS_PER_PAGE = 20;
+
 export function MapView() {
   const [showPanel, setShowPanel] = useState(true);
   const [selectedOpportunity, setSelectedOpportunity] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
   const [mapCenter, setMapCenter] = useState<LatLngExpression>([12.5657, 104.9910]); // Center of Cambodia
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
   const categoryColors: Record<string, string> = {
     'Volunteering': 'bg-sky-500',
@@ -76,20 +89,67 @@ export function MapView() {
     } else {
       setSelectedCategories([...selectedCategories, category]);
     }
+    setCurrentPage(1); // Reset to first page when filter changes
   };
 
-  const filteredOpportunities = mockOpportunities.filter(opp => {
-    if (selectedCategories.length > 0 && !selectedCategories.includes(opp.category)) {
-      return false;
+  const filteredOpportunities = useMemo(() => {
+    return mockOpportunities.filter(opp => {
+      // Category filter
+      if (selectedCategories.length > 0 && !selectedCategories.includes(opp.category)) {
+        return false;
+      }
+      // Location filter
+      if (selectedLocation !== 'all' && opp.location !== selectedLocation) {
+        return false;
+      }
+      // Subcategory filter
+      if (selectedSubcategory !== 'all') {
+        const hasSubcategory = opp.subcategories?.includes(selectedSubcategory as SubcategoryType) || 
+                               opp.subcategory === selectedSubcategory;
+        if (!hasSubcategory) {
+          return false;
+        }
+      }
+      // Search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return opp.title.toLowerCase().includes(query) || 
+               opp.location.toLowerCase().includes(query) ||
+               opp.organization.toLowerCase().includes(query);
+      }
+      return true;
+    });
+  }, [selectedCategories, selectedLocation, selectedSubcategory, searchQuery]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredOpportunities.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedOpportunities = filteredOpportunities.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedLocation, selectedSubcategory, searchQuery]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return opp.title.toLowerCase().includes(query) || 
-             opp.location.toLowerCase().includes(query) ||
-             opp.organization.toLowerCase().includes(query);
-    }
-    return true;
-  });
+  };
+
+  const clearAllFilters = () => {
+    setSelectedCategories([]);
+    setSelectedLocation('all');
+    setSelectedSubcategory('all');
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = selectedCategories.length > 0 || 
+                           selectedLocation !== 'all' || 
+                           selectedSubcategory !== 'all' ||
+                           searchQuery !== '';
 
   const handleLocate = () => {
     if (navigator.geolocation) {
@@ -186,23 +246,81 @@ export function MapView() {
             ))}
           </MapContainer>
 
-          {/* Search Bar - positioned below header with proper spacing */}
+          {/* Search Bar and Filters - positioned below header with proper spacing */}
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto">
-            <form onSubmit={handleSearch} className="bg-white rounded-lg shadow-lg p-2 w-96">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input 
-                  placeholder="Search location..." 
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </form>
+            <div className="bg-white rounded-lg shadow-lg p-2 w-[500px]">
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input 
+                    placeholder="Search opportunities..." 
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={showFilters ? 'bg-blue-50 border-blue-300' : ''}
+                >
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </form>
+              
+              {/* Filter Dropdowns */}
+              {showFilters && (
+                <div className="mt-2 pt-2 border-t space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Locations" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Locations</SelectItem>
+                        {uniqueLocations.map((location) => (
+                          <SelectItem key={location} value={location}>
+                            {location}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Subcategories" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Subcategories</SelectItem>
+                        {allSubcategories.map((subcategory) => (
+                          <SelectItem key={subcategory} value={subcategory}>
+                            {subcategory}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {hasActiveFilters && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full text-xs text-gray-500"
+                      onClick={clearAllFilters}
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Clear all filters
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Filter Chips - positioned below search bar */}
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto">
+          <div className={`absolute ${showFilters ? 'top-44' : 'top-20'} left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto transition-all`}>
             <div className="flex flex-wrap items-center justify-center gap-2 bg-white rounded-lg shadow-lg p-2 max-w-[90vw]">
               {Object.entries(categoryColors).map(([category, color]) => (
                 <Badge 
@@ -263,12 +381,19 @@ export function MapView() {
             {/* Panel Header */}
             <div className="p-4 border-b">
               <h2 className="text-xl mb-2">Nearby Opportunities</h2>
-              <p className="text-sm text-gray-600">{filteredOpportunities.length} opportunities found</p>
+              <p className="text-sm text-gray-600">
+                {filteredOpportunities.length} opportunities found
+                {filteredOpportunities.length > ITEMS_PER_PAGE && (
+                  <span className="ml-1">
+                    (showing {startIndex + 1}-{Math.min(endIndex, filteredOpportunities.length)})
+                  </span>
+                )}
+              </p>
             </div>
 
             {/* Opportunity List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {filteredOpportunities.map((opportunity) => (
+              {paginatedOpportunities.map((opportunity) => (
                 <Card 
                   key={opportunity.id} 
                   className={`cursor-pointer hover:shadow-md transition-shadow ${
@@ -283,6 +408,11 @@ export function MapView() {
                     <Badge className={categoryColors[opportunity.category] + ' text-white text-xs mb-2'}>
                       {opportunity.category}
                     </Badge>
+                    {opportunity.subcategory && (
+                      <Badge variant="outline" className="ml-1 text-xs mb-2">
+                        {opportunity.subcategory}
+                      </Badge>
+                    )}
                     <h3 className="text-sm font-medium mb-1">{opportunity.title}</h3>
                     <p className="text-xs text-gray-600 mb-2">{opportunity.organization}</p>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -292,7 +422,77 @@ export function MapView() {
                   </CardContent>
                 </Card>
               ))}
+              
+              {filteredOpportunities.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No opportunities match your filters.</p>
+                  <Button 
+                    variant="link" 
+                    className="mt-2"
+                    onClick={clearAllFilters}
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
+              )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="p-4 border-t bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Prev
+                  </Button>
+                  
+                  <div className="flex items-center gap-1">
+                    {/* Show page numbers with ellipsis */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        // Always show first, last, current, and adjacent pages
+                        if (page === 1 || page === totalPages) return true;
+                        if (Math.abs(page - currentPage) <= 1) return true;
+                        return false;
+                      })
+                      .map((page, index, arr) => {
+                        // Add ellipsis between non-adjacent pages
+                        const showEllipsisBefore = index > 0 && page - arr[index - 1] > 1;
+                        return (
+                          <React.Fragment key={page}>
+                            {showEllipsisBefore && (
+                              <span className="px-2 text-gray-400">...</span>
+                            )}
+                            <Button
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              className="w-8 h-8 p-0"
+                              onClick={() => handlePageChange(page)}
+                            >
+                              {page}
+                            </Button>
+                          </React.Fragment>
+                        );
+                      })}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
