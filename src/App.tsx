@@ -8,6 +8,7 @@ import { OpportunitySearch } from './pages/OpportunitySearch';
 import { OpportunityDetail } from './pages/OpportunityDetail';
 import { MapView } from './pages/MapView';
 import { UserProfile } from './pages/UserProfile';
+import { SavedOpportunities } from './pages/SavedOpportunities';
 import { EventSubmission } from './pages/EventSubmission';
 import { SubmissionConfirmation } from './pages/SubmissionConfirmation';
 import { SignUp } from './pages/SignUp';
@@ -35,7 +36,7 @@ export default function App() {
         <Route path="/opportunity/:id" element={<OpportunityDetail />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/profile" element={<UserProfile />} />
-        <Route path="/saved" element={<UserProfile />} />
+        <Route path="/saved" element={<SavedOpportunities />} />
         <Route path="/submit" element={<EventSubmission />} />
         <Route path="/submission-confirmation" element={<SubmissionConfirmation />} />
 

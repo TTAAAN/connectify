@@ -452,21 +452,30 @@ export function AdminUserManagement() {
                       <td className="py-4 px-4 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" className="cursor-pointer hover:bg-gray-100">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => { setSelectedUser(user); setIsViewDialogOpen(true); }}>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem 
+                              className="cursor-pointer"
+                              onClick={() => { setSelectedUser(user); setIsViewDialogOpen(true); }}
+                            >
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                            <DropdownMenuItem 
+                              className="cursor-pointer"
+                              onClick={() => handleEditUser(user)}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit User
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleSuspendUser(user)}>
+                            <DropdownMenuItem 
+                              className="cursor-pointer"
+                              onClick={() => handleSuspendUser(user)}
+                            >
                               {user.status === 'suspended' ? (
                                 <>
                                   <UserCheck className="h-4 w-4 mr-2" />
@@ -480,7 +489,7 @@ export function AdminUserManagement() {
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuItem 
-                              className="text-red-600" 
+                              className="text-red-600 cursor-pointer" 
                               onClick={() => { setSelectedUser(user); setIsDeleteDialogOpen(true); }}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />

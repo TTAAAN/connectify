@@ -59,7 +59,7 @@ export function MapView() {
   const [selectedOpportunity, setSelectedOpportunity] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [mapCenter, setMapCenter] = useState<LatLngExpression>([39.8283, -98.5795]); // Center of US
+  const [mapCenter, setMapCenter] = useState<LatLngExpression>([12.5657, 104.9910]); // Center of Cambodia
 
   const categoryColors: Record<string, string> = {
     'Volunteering': 'bg-sky-500',
@@ -127,17 +127,19 @@ export function MapView() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       <Header isAuthenticated />
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
         {/* Map Area */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 overflow-hidden">
           <MapContainer 
             center={mapCenter} 
-            zoom={4} 
+            zoom={7} 
             style={{ height: '100%', width: '100%' }}
             zoomControl={false}
+            maxBounds={[[-90, -180], [90, 180]]}
+            maxBoundsViscosity={1.0}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

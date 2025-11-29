@@ -3,7 +3,7 @@ import { AdminHeader } from '../components/AdminHeader';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { mockSubmissions } from '../lib/mockData';
+import { mockSubmissions, mockOpportunities, mockFlaggedContent } from '../lib/mockData';
 import { 
   Clock, CheckCircle, XCircle, TrendingUp, 
   FileText, Users, Flag, BarChart, Settings, 
@@ -12,9 +12,10 @@ import {
 
 export function AdminDashboard() {
   const pendingCount = mockSubmissions.filter(s => s.status === 'Pending').length;
-  const approvedThisWeek = 42;
-  const rejectedThisWeek = 8;
-  const activeOpportunities = 156;
+  const approvedCount = mockSubmissions.filter(s => s.status === 'Approved').length;
+  const flaggedCount = mockFlaggedContent.length;
+  const activeOpportunities = mockOpportunities.length;
+  const totalUsers = 8; // From mock user data
 
   const urgentItems = mockSubmissions.filter(s => 
     s.priority === 'Urgent' || s.status === 'Flagged'
@@ -64,11 +65,11 @@ export function AdminDashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Approved This Week</p>
-                  <p className="text-4xl mt-1">{approvedThisWeek}</p>
+                  <p className="text-sm text-gray-600">Approved</p>
+                  <p className="text-4xl mt-1">{approvedCount}</p>
                   <div className="flex items-center gap-1 text-green-600 mt-2">
                     <TrendingUp className="h-4 w-4" />
-                    <span className="text-xs">+12% from last week</span>
+                    <span className="text-xs">Active submissions</span>
                   </div>
                 </div>
                 <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center">
@@ -82,8 +83,8 @@ export function AdminDashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Rejected This Week</p>
-                  <p className="text-4xl mt-1">{rejectedThisWeek}</p>
+                  <p className="text-sm text-gray-600">Flagged Content</p>
+                  <p className="text-4xl mt-1">{flaggedCount}</p>
                 </div>
                 <div className="w-14 h-14 bg-red-100 rounded-lg flex items-center justify-center">
                   <XCircle className="h-7 w-7 text-red-600" />
@@ -204,7 +205,7 @@ export function AdminDashboard() {
                           <Users className="h-6 w-6 text-white" />
                         </div>
                         <h4 className="mb-1">User Management</h4>
-                        <p className="text-sm text-gray-600">10,234 users</p>
+                        <p className="text-sm text-gray-600">{totalUsers} users</p>
                       </CardContent>
                     </Card>
                   </Link>
