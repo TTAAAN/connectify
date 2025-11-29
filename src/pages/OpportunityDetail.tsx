@@ -53,16 +53,36 @@ export function OpportunityDetail() {
         toast.success('Shared successfully!');
       } catch (err) {
         // User cancelled or share failed, copy to clipboard instead
-        await navigator.clipboard.writeText(url);
+        copyToClipboard(url);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      copyToClipboard(url);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        toast.success('Link copied to clipboard!', {
+          description: 'Share this link with others.',
+        });
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
         toast.success('Link copied to clipboard!', {
           description: 'Share this link with others.',
         });
       }
-    } else {
-      // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard!', {
-        description: 'Share this link with others.',
+    } catch (err) {
+      toast.error('Failed to copy link', {
+        description: 'Please copy the URL manually from the address bar.',
       });
     }
   };

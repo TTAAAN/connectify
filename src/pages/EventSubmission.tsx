@@ -76,20 +76,30 @@ export function EventSubmission() {
     setIsSaving(true);
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      formData,
-      currentStep,
-      savedAt: new Date().toISOString()
-    }));
-    
-    setLastSaved(new Date());
-    setIsSaving(false);
-    
-    if (!auto) {
-      toast.success('Draft saved!', {
-        description: 'Your progress has been saved locally.',
-      });
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        formData,
+        currentStep,
+        savedAt: new Date().toISOString()
+      }));
+      
+      setLastSaved(new Date());
+      
+      if (!auto) {
+        toast.success('Draft saved!', {
+          description: 'Your progress has been saved locally.',
+        });
+      }
+    } catch (error) {
+      // Handle localStorage errors (quota exceeded, unavailable, etc.)
+      if (!auto) {
+        toast.error('Failed to save draft', {
+          description: 'Your browser storage may be full or unavailable.',
+        });
+      }
     }
+    
+    setIsSaving(false);
   };
 
   const handleNext = () => {
