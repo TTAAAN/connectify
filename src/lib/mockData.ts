@@ -303,9 +303,10 @@ function generateMockOpportunities(count: number): Opportunity[] {
     const selectedSubcategories = subcategoriesOptions[Math.floor(random() * subcategoriesOptions.length)];
     const organization = organizations[Math.floor(random() * organizations.length)];
     
-    // Add some coordinate variance to spread markers
-    const latVariance = (random() - 0.5) * 0.5;
-    const lngVariance = (random() - 0.5) * 0.5;
+    // Add larger coordinate variance to spread markers within cities (approx 10-15km radius)
+    // Use different random calls for lat and lng to get varied positions
+    const latVariance = (seededRandom(seed + i * 7) - 0.5) * 0.15;
+    const lngVariance = (seededRandom(seed + i * 13) - 0.5) * 0.15;
     
     const verified = random() > 0.3;
     const baseDate = new Date("2025-11-01");
