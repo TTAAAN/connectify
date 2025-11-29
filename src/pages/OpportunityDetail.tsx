@@ -20,7 +20,7 @@ import {
 import { 
   MapPin, Calendar, Clock, Users, Mail, Globe, 
   Bookmark, Share2, Flag, CheckCircle, AlertCircle,
-  ChevronRight, ExternalLink, Building2, User, Loader2, Tag
+  ChevronRight, ExternalLink, Building2, User, Loader2, Tag, CalendarPlus
 } from 'lucide-react';
 
 const MAX_VISIBLE_SUBCATEGORIES = 3;
@@ -114,6 +114,29 @@ export function OpportunityDetail() {
     setIsApplying(false);
     toast.success('Application submitted!', {
       description: `Your application for ${opportunity.title} has been sent to ${opportunity.organization}.`,
+    });
+  };
+
+  const handleAddToCalendar = () => {
+    // Create Google Calendar URL
+    const startDate = new Date(opportunity.date);
+    const endDate = new Date(startDate);
+    endDate.setHours(endDate.getHours() + 2); // Default 2 hour duration
+
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+
+    const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
+    googleCalendarUrl.searchParams.set('action', 'TEMPLATE');
+    googleCalendarUrl.searchParams.set('text', opportunity.title);
+    googleCalendarUrl.searchParams.set('dates', `${formatDate(startDate)}/${formatDate(endDate)}`);
+    googleCalendarUrl.searchParams.set('details', `${opportunity.description}\n\nOrganization: ${opportunity.organization}\nWebsite: ${opportunity.website}`);
+    googleCalendarUrl.searchParams.set('location', opportunity.location);
+    
+    window.open(googleCalendarUrl.toString(), '_blank');
+    toast.success('Opening Google Calendar', {
+      description: 'Add this event to your calendar to never miss it!',
     });
   };
 
@@ -256,6 +279,10 @@ export function OpportunityDetail() {
                 >
                   <Bookmark className={`h-5 w-5 mr-2 ${isBookmarked ? 'fill-blue-600 text-blue-600' : ''}`} />
                   {isBookmarked ? 'Saved' : 'Save'}
+                </Button>
+                <Button variant="outline" size="lg" onClick={handleAddToCalendar}>
+                  <CalendarPlus className="h-5 w-5 mr-2" />
+                  Add to Calendar
                 </Button>
                 <Button variant="outline" size="lg" onClick={handleShare}>
                   <Share2 className="h-5 w-5 mr-2" />

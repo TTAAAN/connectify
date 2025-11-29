@@ -13,6 +13,8 @@ import { EventSubmission } from './pages/EventSubmission';
 import { SubmissionConfirmation } from './pages/SubmissionConfirmation';
 import { SignUp } from './pages/SignUp';
 import { Login } from './pages/Login';
+import { Onboarding } from './pages/Onboarding';
+import { Notifications } from './pages/Notifications';
 
 // Admin Pages
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -31,12 +33,14 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/opportunities" element={<OpportunitySearch />} />
         <Route path="/opportunity/:id" element={<OpportunityDetail />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/saved" element={<SavedOpportunities />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/submit" element={<EventSubmission />} />
         <Route path="/submission-confirmation" element={<SubmissionConfirmation />} />
 

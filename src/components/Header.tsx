@@ -1,9 +1,15 @@
-import { Bell, Search, Shield, Clock, CheckCircle, X } from 'lucide-react';
+import { Bell, Search, Shield, Clock, CheckCircle, X, Globe } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -53,7 +59,15 @@ export function Header({ isAuthenticated = false, isAdmin = false }: HeaderProps
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [searchQuery, setSearchQuery] = useState('');
+  const [language, setLanguage] = useState<'en' | 'km'>('en');
   const notificationRef = useRef<HTMLDivElement>(null);
+
+  const handleLanguageChange = (lang: 'en' | 'km') => {
+    setLanguage(lang);
+    toast.success(lang === 'km' ? 'ភាសាបានផ្លាស់ប្ដូរ' : 'Language changed', {
+      description: lang === 'km' ? 'ខ្មែរ' : 'English',
+    });
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -147,6 +161,24 @@ export function Header({ isAuthenticated = false, isAdmin = false }: HeaderProps
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  {language === 'en' ? 'EN' : 'ខ្មែរ'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleLanguageChange('en')} className={language === 'en' ? 'bg-blue-50' : ''}>
+                  🇺🇸 English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLanguageChange('km')} className={language === 'km' ? 'bg-blue-50' : ''}>
+                  🇰🇭 ខ្មែរ (Khmer)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {isAuthenticated ? (
               <>
                 {/* Admin Button - Always shown for demonstration */}
@@ -156,12 +188,14 @@ export function Header({ isAuthenticated = false, isAdmin = false }: HeaderProps
                     Admin
                   </Button>
                 </Link>
-                <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotifications(!showNotifications)}>
-                  <Bell className="h-5 w-5" />
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500">
-                    {unreadCount}
-                  </Badge>
-                </Button>
+                <Link to="/notifications">
+                  <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotifications(!showNotifications)}>
+                    <Bell className="h-5 w-5" />
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500">
+                      {unreadCount}
+                    </Badge>
+                  </Button>
+                </Link>
                 <Link to="/profile">
                   <Avatar className="cursor-pointer">
                     <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-500 text-white">
