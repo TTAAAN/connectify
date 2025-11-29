@@ -133,13 +133,13 @@ export function MapView() {
       {/* Main content area with proper height calculation */}
       <div className="flex-1 relative" style={{ height: 'calc(100vh - 73px)' }}>
         {/* Map Area */}
-        <div className="absolute inset-0 bg-gray-200">
-          <MapContainer 
-            center={mapCenter} 
+        <div className="absolute inset-0 bg-gray-200 z-0">
+          <MapContainer
+            center={mapCenter}
             zoom={7} 
             minZoom={3}
             maxZoom={18}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: '100%', width: '100%', zIndex: 0 }}
             zoomControl={false}
             maxBounds={[[-90, -180], [90, 180]]}
             maxBoundsViscosity={1.0}
