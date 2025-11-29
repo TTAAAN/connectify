@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, type ChangeEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Button } from '../components/ui/button';
@@ -16,64 +16,62 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { mockOpportunities } from '../lib/mockData';
 import { toast } from 'sonner';
 import { 
-  User, Mail, MapPin, Calendar, Bookmark,
-  Send, FileText, Lock, Edit, CheckCircle, Clock, Upload, Camera, Loader2, Trash2, ExternalLink
+  MapPin, Calendar, Bookmark, Edit, CheckCircle, Clock, Upload, Camera, Loader2, Trash2, ExternalLink
 } from 'lucide-react';
 
 export function UserProfile() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('personal');
-  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const savedOpportunities = mockOpportunities.slice(0, 4);
+   const [activeTab, setActiveTab] = useState('personal');
+   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
+   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+   const [isSaving, setIsSaving] = useState(false);
+   const savedOpportunities = mockOpportunities.slice(0, 4);
 
-  const handleSaveChanges = async () => {
-    setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    toast.success('Changes saved successfully!');
-  };
+   const handleSaveChanges = async () => {
+     setIsSaving(true);
+     await new Promise(resolve => setTimeout(resolve, 1000));
+     setIsSaving(false);
+     toast.success('Changes saved successfully!');
+   };
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+     const file = event.target.files?.[0];
+     if (file) {
+       const reader = new FileReader();
+       reader.onloadend = () => {
+         setPreviewUrl(reader.result as string);
+       };
+       reader.readAsDataURL(file);
+     }
+   };
 
-  const handlePhotoUpload = () => {
-    if (previewUrl) {
-      setSelectedPhoto(previewUrl);
-      setIsPhotoDialogOpen(false);
-      setPreviewUrl(null);
-      toast.success('Profile photo updated!');
-    }
-  };
+   const handlePhotoUpload = () => {
+     if (previewUrl) {
+       setSelectedPhoto(previewUrl);
+       setIsPhotoDialogOpen(false);
+       setPreviewUrl(null);
+       toast.success('Profile photo updated!');
+     }
+   };
 
-  const handleRemoveSaved = (title: string) => {
-    toast.info('Removed from saved', {
-      description: `${title} has been removed from your saved items.`,
-    });
-  };
+   const handleRemoveSaved = (title: string) => {
+     toast.info('Removed from saved', {
+       description: `${title} has been removed from your saved items.`,
+     });
+   };
 
-  return (
+   return (
     <div className="min-h-screen bg-gray-50">
       <Header isAuthenticated />
 
-      <div className="container mx-auto px-6 py-10">
-        <h1 className="text-4xl mb-8">My Profile</h1>
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <h1 className="text-4xl mb-6">My Profile</h1>
 
-        <div className="grid grid-cols-4 gap-8">
+        <div className="grid grid-cols-4 gap-6">
           {/* Left Sidebar - Profile Overview */}
           <div className="col-span-1">
             <Card className="shadow-sm">
-              <CardContent className="p-6">
+              <CardContent className="p-6 sm:p-8">
                 <div className="text-center mb-6">
                   <div className="relative inline-block">
                     <Avatar className="w-28 h-28 mx-auto mb-4 ring-4 ring-blue-50">
@@ -127,52 +125,52 @@ export function UserProfile() {
           {/* Right Content - Tabbed Sections */}
           <div className="col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-6 w-full mb-6 h-12">
-                <TabsTrigger value="personal" className="text-sm">Personal Info</TabsTrigger>
-                <TabsTrigger value="preferences" className="text-sm">Preferences</TabsTrigger>
-                <TabsTrigger value="saved" className="text-sm">Saved</TabsTrigger>
-                <TabsTrigger value="applications" className="text-sm">Applications</TabsTrigger>
-                <TabsTrigger value="submissions" className="text-sm">My Submissions</TabsTrigger>
-                <TabsTrigger value="security" className="text-sm">Security</TabsTrigger>
+              <TabsList className="grid grid-cols-6 w-full mb-4 gap-2 h-10 sm:h-12">
+                <TabsTrigger value="personal" className="text-sm py-2 px-3">Personal Info</TabsTrigger>
+                <TabsTrigger value="preferences" className="text-sm py-2 px-3">Preferences</TabsTrigger>
+                <TabsTrigger value="saved" className="text-sm py-2 px-3">Saved</TabsTrigger>
+                <TabsTrigger value="applications" className="text-sm py-2 px-3">Applications</TabsTrigger>
+                <TabsTrigger value="submissions" className="text-sm py-2 px-3">My Submissions</TabsTrigger>
+                <TabsTrigger value="security" className="text-sm py-2 px-3">Security</TabsTrigger>
               </TabsList>
 
               {/* Personal Info Tab */}
               <TabsContent value="personal" className="mt-0">
                 <Card className="shadow-sm">
-                  <CardContent className="p-8">
-                    <h3 className="text-xl font-semibold mb-8">Personal Information</h3>
+                  <CardContent className="p-6 sm:p-8">
+                    <h3 className="text-xl font-semibold mb-6">Personal Information</h3>
                     <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" defaultValue="Jane" className="h-11" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" defaultValue="Doe" className="h-11" />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" defaultValue="jane.doe@email.com" className="h-11" />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" className="h-11" />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="location">Location</Label>
-                        <Input id="location" placeholder="City, State/Country" className="h-11" />
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <Label htmlFor="bio">Bio</Label>
-                        <Textarea 
-                          id="bio" 
-                          placeholder="Tell us about yourself..."
-                          rows={4}
-                          className="resize-none"
-                        />
-                      </div>
+                      <div className="space-y-3">
+                         <Label htmlFor="firstName">First Name</Label>
+                         <Input id="firstName" defaultValue="Jane" className="h-11" />
+                       </div>
+                      <div className="space-y-3">
+                         <Label htmlFor="lastName">Last Name</Label>
+                         <Input id="lastName" defaultValue="Doe" className="h-11" />
+                       </div>
+                      <div className="col-span-2 space-y-3">
+                         <Label htmlFor="email">Email Address</Label>
+                         <Input id="email" type="email" defaultValue="jane.doe@email.com" className="h-11" />
+                       </div>
+                      <div className="col-span-2 space-y-3">
+                         <Label htmlFor="phone">Phone Number</Label>
+                         <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" className="h-11" />
+                       </div>
+                      <div className="col-span-2 space-y-3">
+                         <Label htmlFor="location">Location</Label>
+                         <Input id="location" placeholder="City, State/Country" className="h-11" />
+                       </div>
+                      <div className="col-span-2 space-y-3">
+                         <Label htmlFor="bio">Bio</Label>
+                         <Textarea
+                           id="bio"
+                           placeholder="Tell us about yourself..."
+                           rows={4}
+                           className="resize-none"
+                         />
+                       </div>
                     </div>
-                    <Separator className="my-8" />
+                    <Separator className="my-6" />
                     <div className="flex justify-end gap-4">
                       <Button variant="outline" className="h-11 px-6">Cancel</Button>
                       <Button 
@@ -197,9 +195,9 @@ export function UserProfile() {
               {/* Preferences Tab */}
               <TabsContent value="preferences" className="mt-0">
                 <Card className="shadow-sm">
-                  <CardContent className="p-8">
-                    <h3 className="text-xl font-semibold mb-8">Preferences & Interests</h3>
-                    
+                  <CardContent className="p-6 sm:p-8">
+                    <h3 className="text-xl font-semibold mb-6">Preferences & Interests</h3>
+
                     <div className="space-y-8">
                       <div>
                         <Label className="text-base font-medium mb-4 block">Interested Categories</Label>
@@ -244,13 +242,13 @@ export function UserProfile() {
 
                       <Separator />
 
-                      <div className="space-y-2">
-                        <Label htmlFor="preferredLocation">Preferred Location</Label>
-                        <Input id="preferredLocation" placeholder="e.g., San Francisco, CA" className="h-11 max-w-md" />
-                      </div>
+                      <div className="space-y-3">
+                         <Label htmlFor="preferredLocation">Preferred Location</Label>
+                         <Input id="preferredLocation" placeholder="e.g., San Francisco, CA" className="h-11 max-w-md" />
+                       </div>
                     </div>
 
-                    <Separator className="my-8" />
+                    <Separator className="my-6" />
                     <div className="flex justify-end gap-4">
                       <Button variant="outline" className="h-11 px-6">Cancel</Button>
                       <Button 
@@ -275,14 +273,14 @@ export function UserProfile() {
               {/* Saved Opportunities Tab */}
               <TabsContent value="saved" className="mt-0">
                 <Card className="shadow-sm">
-                  <CardContent className="p-8">
+                  <CardContent className="p-6 sm:p-8">
                     <div className="flex items-center justify-between mb-8">
                       <h3 className="text-xl font-semibold">Saved Opportunities</h3>
                       <Badge variant="outline" className="text-blue-600">{savedOpportunities.length} saved</Badge>
                     </div>
                     <div className="space-y-4">
                       {savedOpportunities.map((opportunity) => (
-                        <div key={opportunity.id} className="border rounded-xl p-5 flex items-center justify-between hover:shadow-md transition-all hover:border-blue-200 bg-white">
+                        <div key={opportunity.id} className="border rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all hover:border-blue-200 bg-white">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <h4 className="text-lg font-medium">{opportunity.title}</h4>
@@ -341,7 +339,7 @@ export function UserProfile() {
               {/* Applications Tab */}
               <TabsContent value="applications" className="mt-0">
                 <Card className="shadow-sm">
-                  <CardContent className="p-8">
+                  <CardContent className="p-6 sm:p-8">
                     <h3 className="text-xl font-semibold mb-8">Application History</h3>
                     <div className="space-y-4">
                       {mockOpportunities.slice(0, 5).map((opportunity, index) => {
@@ -377,7 +375,7 @@ export function UserProfile() {
               {/* My Submissions Tab */}
               <TabsContent value="submissions">
                 <Card>
-                  <CardContent className="pt-6">
+                  <CardContent className="p-6 sm:p-8">
                     <h3 className="text-xl mb-6">My Event Submissions</h3>
                     <div className="space-y-4">
                       <div className="border rounded-lg p-4">
@@ -414,7 +412,7 @@ export function UserProfile() {
               {/* Security Tab */}
               <TabsContent value="security">
                 <Card>
-                  <CardContent className="pt-6">
+                  <CardContent className="p-6 sm:p-8">
                     <h3 className="text-xl mb-6">Security Settings</h3>
                     
                     <div className="space-y-6">
@@ -552,3 +550,4 @@ export function UserProfile() {
     </div>
   );
 }
+
