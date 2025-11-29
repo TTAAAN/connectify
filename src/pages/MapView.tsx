@@ -127,19 +127,22 @@ export function MapView() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-100">
       <Header isAuthenticated />
 
       <div className="flex-1 relative overflow-hidden">
         {/* Map Area */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden bg-gray-200">
           <MapContainer 
             center={mapCenter} 
             zoom={7} 
+            minZoom={3}
+            maxZoom={18}
             style={{ height: '100%', width: '100%' }}
             zoomControl={false}
             maxBounds={[[-90, -180], [90, 180]]}
             maxBoundsViscosity={1.0}
+            worldCopyJump={true}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

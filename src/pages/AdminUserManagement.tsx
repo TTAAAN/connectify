@@ -456,17 +456,17 @@ export function AdminUserManagement() {
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuContent align="end" className="w-48 bg-white">
                             <DropdownMenuItem 
                               className="cursor-pointer"
-                              onClick={() => { setSelectedUser(user); setIsViewDialogOpen(true); }}
+                              onSelect={() => { setSelectedUser(user); setIsViewDialogOpen(true); }}
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="cursor-pointer"
-                              onClick={() => handleEditUser(user)}
+                              onSelect={() => handleEditUser(user)}
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit User
@@ -474,7 +474,7 @@ export function AdminUserManagement() {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
                               className="cursor-pointer"
-                              onClick={() => handleSuspendUser(user)}
+                              onSelect={() => handleSuspendUser(user)}
                             >
                               {user.status === 'suspended' ? (
                                 <>
@@ -490,7 +490,7 @@ export function AdminUserManagement() {
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="text-red-600 cursor-pointer" 
-                              onClick={() => { setSelectedUser(user); setIsDeleteDialogOpen(true); }}
+                              onSelect={() => { setSelectedUser(user); setIsDeleteDialogOpen(true); }}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Delete User
