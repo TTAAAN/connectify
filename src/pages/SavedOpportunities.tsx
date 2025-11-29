@@ -27,7 +27,7 @@ export function SavedOpportunities() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl mb-2">Saved Opportunities</h1>
+          <h1 className="text-4xl font-bold mb-2">Saved Opportunities</h1>
           <p className="text-gray-600">Your bookmarked opportunities for quick access</p>
         </div>
 
@@ -48,7 +48,7 @@ export function SavedOpportunities() {
                     <div className="flex-1 pr-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Badge className="bg-blue-100 text-blue-700">{opportunity.category}</Badge>
-                        <h4 className="font-medium">{opportunity.title}</h4>
+                        <h4 className="font-semibold text-lg">{opportunity.title}</h4>
                         {opportunity.verified && (
                           <CheckCircle className="h-4 w-4 text-green-500" />
                         )}
