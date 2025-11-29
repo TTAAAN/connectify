@@ -117,20 +117,32 @@ export function OpportunityDetail() {
     });
   };
 
+  // Default event duration by category (in hours)
+  const categoryDurations: Record<string, number> = {
+    'Volunteering': 4,
+    'Workshops': 3,
+    'Competitions': 8,
+    'Internships': 8,
+    'Jobs': 1,
+    'Events': 2,
+  };
+
+  // Format date for Google Calendar URL (YYYYMMDDTHHMMSSZ format)
+  const formatDateForCalendar = (date: Date): string => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+
   const handleAddToCalendar = () => {
     // Create Google Calendar URL
     const startDate = new Date(opportunity.date);
     const endDate = new Date(startDate);
-    endDate.setHours(endDate.getHours() + 2); // Default 2 hour duration
-
-    const formatDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
+    const duration = categoryDurations[opportunity.category] || 2;
+    endDate.setHours(endDate.getHours() + duration);
 
     const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
     googleCalendarUrl.searchParams.set('action', 'TEMPLATE');
     googleCalendarUrl.searchParams.set('text', opportunity.title);
-    googleCalendarUrl.searchParams.set('dates', `${formatDate(startDate)}/${formatDate(endDate)}`);
+    googleCalendarUrl.searchParams.set('dates', `${formatDateForCalendar(startDate)}/${formatDateForCalendar(endDate)}`);
     googleCalendarUrl.searchParams.set('details', `${opportunity.description}\n\nOrganization: ${opportunity.organization}\nWebsite: ${opportunity.website}`);
     googleCalendarUrl.searchParams.set('location', opportunity.location);
     

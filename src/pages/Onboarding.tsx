@@ -73,6 +73,16 @@ export function Onboarding() {
   };
 
   const handleComplete = () => {
+    // Save preferences to localStorage for persistence
+    const preferences = {
+      categories: selectedCategories,
+      skills: selectedSkills,
+      locations: selectedLocations,
+      includeRemote,
+      completedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('userPreferences', JSON.stringify(preferences));
+    
     toast.success('Welcome to Connectify! 🎉', {
       description: 'Your preferences have been saved. Start exploring opportunities tailored for you!',
     });
