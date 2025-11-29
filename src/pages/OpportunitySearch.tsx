@@ -132,10 +132,14 @@ export function OpportunitySearch() {
       if (!matchesProvince) return false;
     }
 
-    // Category and Subcategory filter (combined with OR logic)
-    const allSelectedCategories = [...selectedCategories, ...selectedSubcategories];
-    if (allSelectedCategories.length > 0) {
-      if (!allSelectedCategories.includes(opportunity.category)) return false;
+    // Category filter
+    if (selectedCategories.length > 0) {
+      if (!selectedCategories.includes(opportunity.category)) return false;
+    }
+
+    // Subcategory filter (filters by the subcategory field)
+    if (selectedSubcategories.length > 0) {
+      if (!opportunity.subcategory || !selectedSubcategories.includes(opportunity.subcategory)) return false;
     }
 
     // Poster type filter

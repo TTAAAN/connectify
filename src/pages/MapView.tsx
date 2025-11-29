@@ -43,10 +43,6 @@ const categoryIcons: Record<string, Icon> = {
   'Internships': createCategoryIcon('orange'),
   'Jobs': createCategoryIcon('red'),
   'Events': createCategoryIcon('gold'),
-  'Fun': createCategoryIcon('yellow'),
-  'Technology': createCategoryIcon('grey'),
-  'Education': createCategoryIcon('black'),
-  'ETC': createCategoryIcon('green'),
 };
 
 // Component to handle map center updates
@@ -71,11 +67,7 @@ export function MapView() {
     'Competitions': 'bg-violet-500',
     'Internships': 'bg-orange-500',
     'Jobs': 'bg-red-500',
-    'Events': 'bg-yellow-500',
-    'Fun': 'bg-amber-400',
-    'Technology': 'bg-gray-500',
-    'Education': 'bg-slate-800',
-    'ETC': 'bg-emerald-500'
+    'Events': 'bg-yellow-500'
   };
 
   const handleCategoryToggle = (category: string) => {
