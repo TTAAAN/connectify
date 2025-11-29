@@ -289,28 +289,7 @@ export function OpportunitySearch() {
 
                 <Separator className="my-6" />
 
-                {/* Subcategory Filter */}
-                <div className="mb-6">
-                  <h4 className="mb-3">Subcategory</h4>
-                  <div className="space-y-2">
-                    {subcategories.map((subcategory) => (
-                      <div key={subcategory} className="flex items-center gap-2">
-                        <Checkbox 
-                          id={`subcategory-${subcategory}`} 
-                          checked={selectedSubcategories.includes(subcategory)}
-                          onCheckedChange={(checked) => handleSubcategoryToggle(subcategory, checked as boolean)}
-                        />
-                        <Label htmlFor={`subcategory-${subcategory}`} className="cursor-pointer">
-                          {subcategory}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
-                {/* Category */}
+                {/* Category - Main categories first */}
                 <div className="mb-6">
                   <h4 className="mb-3">Category</h4>
                   <div className="space-y-2">
@@ -327,6 +306,50 @@ export function OpportunitySearch() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                <Separator className="my-6" />
+
+                {/* Subcategory Filter - Using dropdown for scalability */}
+                <div className="mb-6">
+                  <h4 className="mb-3">Subcategory</h4>
+                  <Select 
+                    value={selectedSubcategories.length > 0 ? "selected" : ""}
+                    onValueChange={() => {}}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select subcategories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2 max-h-60 overflow-y-auto">
+                        {subcategories.map((subcategory) => (
+                          <div key={subcategory} className="flex items-center gap-2 py-1">
+                            <Checkbox 
+                              id={`subcategory-${subcategory}`}
+                              checked={selectedSubcategories.includes(subcategory)}
+                              onCheckedChange={(checked) => handleSubcategoryToggle(subcategory, checked as boolean)}
+                            />
+                            <Label htmlFor={`subcategory-${subcategory}`} className="cursor-pointer text-sm">
+                              {subcategory}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </SelectContent>
+                  </Select>
+                  {selectedSubcategories.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {selectedSubcategories.map((subcategory) => (
+                        <span 
+                          key={subcategory}
+                          className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full cursor-pointer hover:bg-green-200"
+                          onClick={() => handleSubcategoryToggle(subcategory, false)}
+                        >
+                          {subcategory} ×
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <Separator className="my-6" />

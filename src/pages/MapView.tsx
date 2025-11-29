@@ -127,10 +127,11 @@ export function MapView() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       <Header isAuthenticated />
 
-      <div className="flex-1 relative">
+      {/* Main content area with proper height calculation */}
+      <div className="flex-1 relative" style={{ height: 'calc(100vh - 73px)' }}>
         {/* Map Area */}
         <div className="absolute inset-0 bg-gray-200">
           <MapContainer 
