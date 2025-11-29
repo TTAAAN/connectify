@@ -32,9 +32,13 @@ export function UserDashboard() {
     
     // Simulated user stats based on opportunity data
     // In a real app, these would come from user-specific data
-    const savedItems = Math.min(verifiedOpportunities.length, Math.floor(verifiedOpportunities.length * 0.02));
-    const applications = Math.floor(savedItems * 0.6);
-    const recommendations = verifiedOpportunities.filter(o => o.verified).slice(0, 30).length;
+    const SAVED_ITEMS_PERCENTAGE = 0.02;
+    const APPLICATIONS_PERCENTAGE = 0.6;
+    const MAX_RECOMMENDATIONS = 30;
+    
+    const savedItems = Math.min(verifiedOpportunities.length, Math.floor(verifiedOpportunities.length * SAVED_ITEMS_PERCENTAGE));
+    const applications = Math.floor(savedItems * APPLICATIONS_PERCENTAGE);
+    const recommendations = verifiedOpportunities.slice(0, MAX_RECOMMENDATIONS).length;
     
     return {
       savedItems,
