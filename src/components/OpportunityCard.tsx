@@ -43,9 +43,16 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
       <CardHeader>
         <div className="flex items-start justify-between gap-2 mb-2">
-          <Badge className={categoryColors[opportunity.category]}>
-            {opportunity.category}
-          </Badge>
+          <div className="flex flex-wrap gap-1">
+            <Badge className={categoryColors[opportunity.category]}>
+              {opportunity.category}
+            </Badge>
+            {opportunity.subcategory && (
+              <Badge variant="outline" className="text-gray-600">
+                {opportunity.subcategory}
+              </Badge>
+            )}
+          </div>
           {opportunity.isPartnered ? (
             <Badge className="bg-slate-700 text-white flex items-center gap-1">
               <Building2 className="h-3 w-3" />

@@ -139,6 +139,11 @@ export function OpportunityDetail() {
                     <Badge className={categoryColors[opportunity.category]}>
                       {opportunity.category}
                     </Badge>
+                    {opportunity.subcategory && (
+                      <Badge variant="outline" className="text-gray-600">
+                        {opportunity.subcategory}
+                      </Badge>
+                    )}
                     
                     {opportunity.isPartnered ? (
                       <Badge className="bg-slate-700 text-white gap-1">
