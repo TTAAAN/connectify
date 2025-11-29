@@ -92,288 +92,290 @@ export const allSubcategories: SubcategoryType[] = [
   "ETC",
 ];
 
-export const mockOpportunities: Opportunity[] = [
-  {
-    id: "1",
-    title: "Community Garden Volunteer Program",
-    organization: "Green Earth Initiative Cambodia",
-    category: "Volunteering",
-    subcategory: "Fun",
-    subcategories: ["Fun", "Environment", "Health", "Social Impact", "Education"],
-    verified: true,
-    verifiedDate: "2025-11-10",
-    location: "Phnom Penh, Cambodia",
-    isRemote: false,
-    date: "2025-11-25",
-    deadline: "2025-11-20",
-    description:
-      "Join us in creating sustainable community gardens across Phnom Penh. Help plant vegetables, maintain green spaces, and teach community members about sustainable farming practices.",
-    requirements: [
-      "Physical ability to work outdoors",
-      "Weekend availability",
-      "Passion for sustainability",
-    ],
-    benefits: [
-      "Community service hours",
-      "Learn about sustainable farming",
-      "Meet like-minded people",
-    ],
-    status: "Open",
-    capacity: "20",
-    postedDate: "2025-11-01",
-    lastUpdated: "2025-11-10",
-    contact: "volunteer@greenearth.org",
-    website: "https://greenearth.org",
-    coordinates: { lat: 11.5564, lng: 104.9282 },
-    views: 234,
-    applications: 12,
-  },
-  {
-    id: "2",
-    title: "UX Design Workshop: Figma Masterclass",
-    organization: "Design Academy Cambodia",
-    category: "Workshops",
-    subcategory: "Technology",
-    subcategories: ["Technology", "Arts", "Career Development", "Networking", "Education", "Business"],
-    verified: true,
-    verifiedDate: "2025-11-12",
-    isPartnered: true,
-    location: "Remote",
-    isRemote: true,
-    date: "2025-12-05",
-    deadline: "2025-11-30",
-    description:
-      "Master Figma with industry professionals. Learn advanced prototyping, design systems, and collaborative workflows in this intensive 2-day workshop.",
-    requirements: [
-      "Basic design knowledge",
-      "Figma account",
-      "Computer with internet",
-    ],
-    benefits: [
-      "Certificate of completion",
-      "Design portfolio review",
-      "Networking with professionals",
-    ],
-    status: "Open",
-    capacity: "50",
-    postedDate: "2025-11-05",
-    lastUpdated: "2025-11-12",
-    contact: "workshops@designacademy.com",
-    website: "https://designacademy.com",
-    coordinates: { lat: 11.5684, lng: 104.9210 },
-    views: 456,
-    applications: 38,
-  },
-  {
-    id: "3",
-    title: "AI Hackthon 2025: AI Masterclass",
-    organization: "TechHub Siem Reap",
-    category: "Competitions",
-    subcategory: "Technology",
-    subcategories: ["Technology", "Research", "Networking", "Career Development"],
-    verified: true,
-    verifiedDate: "2025-11-08",
-    isPartnered: true,
-    location: "Siem Reap, Cambodia",
-    isRemote: false,
-    date: "2025-12-15",
-    deadline: "2025-12-01",
-    description:
-      "Build innovative AI solutions in 48 hours. Compete for $50,000 in prizes while solving real-world problems with machine learning and AI.",
-    requirements: [
-      "Programming experience",
-      "Team of 2-4 members",
-      "Bring your own laptop",
-    ],
-    benefits: [
-      "$50,000 prize pool",
-      "Mentorship from AI experts",
-      "Networking opportunities",
-    ],
-    status: "Open",
-    capacity: "200",
-    postedDate: "2025-10-28",
-    lastUpdated: "2025-11-08",
-    contact: "hackathon@techhub.com",
-    website: "https://techhub.com/hackathon",
-    coordinates: { lat: 13.3633, lng: 103.8564 },
-    views: 1203,
-    applications: 89,
-  },
-  {
-    id: "4",
-    title: "Software Engineering Internship",
-    organization: "CloudTech Cambodia",
-    category: "Internships",
-    subcategory: "Technology",
-    subcategories: ["Technology", "Career Development", "Education", "Business", "Research", "Networking", "Leadership"],
-    verified: true,
-    verifiedDate: "2025-11-15",
-    location: "Battambang, Cambodia",
-    isRemote: false,
-    date: "2026-01-15",
-    deadline: "2025-12-10",
-    description:
-      "Join our engineering team for a 3-month summer internship. Work on real projects, learn from senior engineers, and build production-ready features.",
-    requirements: [
-      "Computer Science student",
-      "JavaScript/React experience",
-      "Available for 3 months",
-    ],
-    benefits: [
-      "$8,000/month stipend",
-      "Housing assistance",
-      "Full-time conversion opportunity",
-    ],
-    status: "Open",
-    capacity: "10",
-    postedDate: "2025-11-15",
-    lastUpdated: "2025-11-15",
-    contact: "internships@cloudtech.com",
-    website: "https://cloudtech.com/careers",
-    coordinates: { lat: 13.0957, lng: 103.2022 },
-    views: 876,
-    applications: 156,
-  },
-  {
-    id: "5",
-    title: "Junior Frontend Developer",
-    organization: "StartupXYZ Cambodia",
-    category: "Jobs",
-    subcategory: "Technology",
-    subcategories: ["Technology", "Career Development", "Business"],
-    verified: false,
-    location: "Remote",
-    isRemote: true,
-    date: "2025-12-01",
-    deadline: "2025-11-25",
-    description:
-      "Looking for a passionate frontend developer to join our growing team. Build beautiful, responsive web applications using React and modern technologies.",
-    requirements: [
-      "1-2 years React experience",
-      "TypeScript knowledge",
-      "Portfolio of projects",
-    ],
-    benefits: [
-      "$70-90k salary",
-      "Remote work",
-      "Equity options",
-      "Health insurance",
-    ],
-    status: "Open",
-    capacity: "Unlimited",
-    postedDate: "2025-11-16",
-    lastUpdated: "2025-11-16",
-    contact: "jobs@startupxyz.com",
-    website: "https://startupxyz.com",
-    coordinates: { lat: 11.5448, lng: 104.8921 },
-    views: 543,
-    applications: 67,
-  },
-  {
-    id: "6",
-    title: "Tech Career Fair 2025",
-    organization: "University Career Center",
-    category: "Events",
-    subcategory: "Education",
-    subcategories: ["Education", "Career Development", "Networking", "Technology", "Business"],
-    verified: true,
-    verifiedDate: "2025-11-11",
-    location: "Kampong Cham, Cambodia",
-    isRemote: false,
-    date: "2025-11-30",
-    deadline: "2025-11-28",
-    description:
-      "Meet 100+ employers including Google, Microsoft, Amazon, and local startups. Bring your resume and prepare for on-site interviews.",
-    requirements: [
-      "Professional attire",
-      "Resume copies",
-      "University ID",
-    ],
-    benefits: [
-      "Meet top employers",
-      "On-site interviews",
-      "Free professional headshots",
-    ],
-    status: "Open",
-    capacity: "500",
-    postedDate: "2025-10-20",
-    lastUpdated: "2025-11-11",
-    contact: "careers@university.edu",
-    website: "https://university.edu/careerfair",
-    coordinates: { lat: 11.9931, lng: 105.4549 },
-    views: 2103,
-    applications: 342,
-  },
-  {
-    id: "7",
-    title: "Data Science Bootcamp",
-    organization: "Learning Hub",
-    category: "Workshops",
-    subcategory: "Education",
-    subcategories: ["Education", "Technology", "Research", "Career Development"],
-    verified: true,
-    verifiedDate: "2025-11-14",
-    location: "Sihanoukville, Cambodia",
-    isRemote: false,
-    date: "2026-01-10",
-    deadline: "2025-12-15",
-    description:
-      "Intensive 8-week bootcamp covering Python, machine learning, data visualization, and real-world data science projects.",
-    requirements: [
-      "Basic programming knowledge",
-      "Math background helpful",
-      "Full-time availability",
-    ],
-    benefits: [
-      "Job placement assistance",
-      "Industry certification",
-      "Portfolio projects",
-    ],
-    status: "Open",
-    capacity: "30",
-    postedDate: "2025-11-10",
-    lastUpdated: "2025-11-14",
-    contact: "bootcamp@learninghub.com",
-    website: "https://learninghub.com",
-    coordinates: { lat: 10.6093, lng: 103.5296 },
-    views: 678,
-    applications: 94,
-  },
-  {
-    id: "8",
-    title: "Environmental Research Assistant",
-    organization: "Ocean Conservation Lab",
-    category: "Internships",
-    subcategories: ["Environment", "Research", "Health", "Education", "Social Impact"],
-    verified: false,
-    location: "Kep, Cambodia",
-    isRemote: false,
-    date: "2026-02-01",
-    deadline: "2025-12-20",
-    description:
-      "Assist with marine biology research, data collection, and conservation efforts. Perfect for biology or environmental science students.",
-    requirements: [
-      "Biology or related major",
-      "Swimming skills",
-      "Research experience preferred",
-    ],
-    benefits: [
-      "$15/hour",
-      "Field research experience",
-      "Publication opportunities",
-    ],
-    status: "Open",
-    capacity: "5",
-    postedDate: "2025-11-17",
-    lastUpdated: "2025-11-17",
-    contact: "research@oceanlab.org",
-    website: "https://oceanlab.org",
-    coordinates: { lat: 10.4833, lng: 104.3167 },
-    views: 234,
-    applications: 28,
-  },
+// Cambodia location data for generating mock data
+const cambodiaLocations = [
+  { name: "Phnom Penh, Cambodia", lat: 11.5564, lng: 104.9282 },
+  { name: "Siem Reap, Cambodia", lat: 13.3633, lng: 103.8564 },
+  { name: "Battambang, Cambodia", lat: 13.0957, lng: 103.2022 },
+  { name: "Sihanoukville, Cambodia", lat: 10.6093, lng: 103.5296 },
+  { name: "Kampong Cham, Cambodia", lat: 11.9931, lng: 105.4549 },
+  { name: "Kep, Cambodia", lat: 10.4833, lng: 104.3167 },
+  { name: "Kampot, Cambodia", lat: 10.6104, lng: 104.1799 },
+  { name: "Kratie, Cambodia", lat: 12.4880, lng: 106.0190 },
+  { name: "Pursat, Cambodia", lat: 12.5387, lng: 103.9192 },
+  { name: "Takeo, Cambodia", lat: 10.9908, lng: 104.7855 },
+  { name: "Prey Veng, Cambodia", lat: 11.4864, lng: 105.3242 },
+  { name: "Svay Rieng, Cambodia", lat: 11.0879, lng: 105.7990 },
+  { name: "Kandal, Cambodia", lat: 11.2232, lng: 105.0000 },
+  { name: "Kompong Thom, Cambodia", lat: 12.7111, lng: 104.8891 },
+  { name: "Banteay Meanchey, Cambodia", lat: 13.5859, lng: 102.9730 },
+  { name: "Remote", lat: 11.5564, lng: 104.9282, isRemote: true },
 ];
+
+const categories: Opportunity["category"][] = [
+  "Volunteering",
+  "Workshops",
+  "Competitions",
+  "Internships",
+  "Jobs",
+  "Events",
+];
+
+const organizations = [
+  "Green Earth Initiative Cambodia",
+  "Design Academy Cambodia",
+  "TechHub Cambodia",
+  "CloudTech Cambodia",
+  "StartupXYZ Cambodia",
+  "University Career Center",
+  "Learning Hub",
+  "Ocean Conservation Lab",
+  "Digital Innovation Center",
+  "Youth Empowerment Foundation",
+  "Creative Arts Cambodia",
+  "Sports Development Organization",
+  "Business Leaders Network",
+  "Social Impact Hub",
+  "Research Institute Cambodia",
+  "Leadership Academy",
+  "Professional Networking Group",
+  "Career Development Center",
+  "Tech Innovators Cambodia",
+  "Community Development Organization",
+  "Environmental Action Group",
+  "Health & Wellness Foundation",
+  "Education for All Cambodia",
+  "Arts & Culture Society",
+  "Sports Academy Cambodia",
+  "Startup Incubator Cambodia",
+  "NGO Coalition Cambodia",
+  "Youth Development Initiative",
+  "Innovation Lab Phnom Penh",
+  "Skill Building Center",
+];
+
+const titlePrefixes = [
+  "Community",
+  "Youth",
+  "Digital",
+  "Creative",
+  "Professional",
+  "International",
+  "Regional",
+  "Local",
+  "Advanced",
+  "Beginner",
+  "Expert",
+  "Senior",
+  "Junior",
+  "Lead",
+  "Associate",
+];
+
+const titleSuffixes: Record<Opportunity["category"], string[]> = {
+  Volunteering: [
+    "Volunteer Program",
+    "Community Service",
+    "Outreach Initiative",
+    "Support Program",
+    "Assistance Project",
+    "Help Campaign",
+    "Aid Program",
+    "Charity Drive",
+  ],
+  Workshops: [
+    "Workshop",
+    "Training Session",
+    "Masterclass",
+    "Bootcamp",
+    "Seminar",
+    "Tutorial Series",
+    "Skill Building Session",
+    "Learning Program",
+  ],
+  Competitions: [
+    "Hackathon",
+    "Challenge",
+    "Competition",
+    "Contest",
+    "Tournament",
+    "Championship",
+    "Pitch Competition",
+    "Innovation Challenge",
+  ],
+  Internships: [
+    "Internship",
+    "Fellowship",
+    "Apprenticeship",
+    "Trainee Program",
+    "Graduate Program",
+    "Summer Internship",
+    "Research Internship",
+    "Industry Placement",
+  ],
+  Jobs: [
+    "Developer Position",
+    "Manager Role",
+    "Specialist Position",
+    "Coordinator Role",
+    "Analyst Position",
+    "Engineer Role",
+    "Designer Position",
+    "Consultant Role",
+  ],
+  Events: [
+    "Conference",
+    "Summit",
+    "Meetup",
+    "Networking Event",
+    "Career Fair",
+    "Expo",
+    "Festival",
+    "Symposium",
+  ],
+};
+
+const subcategoryMapping: Record<Opportunity["category"], SubcategoryType[][]> = {
+  Volunteering: [
+    ["Fun", "Environment", "Health", "Social Impact", "Education"],
+    ["Social Impact", "Education", "Health"],
+    ["Environment", "Health", "Social Impact"],
+    ["Fun", "Sports", "Social Impact"],
+    ["Education", "Social Impact", "Leadership"],
+  ],
+  Workshops: [
+    ["Technology", "Arts", "Career Development", "Networking", "Education", "Business"],
+    ["Education", "Technology", "Research", "Career Development"],
+    ["Arts", "Education", "Fun"],
+    ["Business", "Leadership", "Networking"],
+    ["Health", "Education", "Social Impact"],
+  ],
+  Competitions: [
+    ["Technology", "Research", "Networking", "Career Development"],
+    ["Business", "Leadership", "Networking"],
+    ["Arts", "Fun", "Education"],
+    ["Sports", "Fun", "Health"],
+    ["Environment", "Research", "Social Impact"],
+  ],
+  Internships: [
+    ["Technology", "Career Development", "Education", "Business", "Research", "Networking", "Leadership"],
+    ["Environment", "Research", "Health", "Education", "Social Impact"],
+    ["Business", "Career Development", "Networking"],
+    ["Arts", "Education", "Career Development"],
+    ["Health", "Research", "Education"],
+  ],
+  Jobs: [
+    ["Technology", "Career Development", "Business"],
+    ["Business", "Leadership", "Networking"],
+    ["Arts", "Career Development"],
+    ["Health", "Research", "Education"],
+    ["Environment", "Research", "Social Impact"],
+  ],
+  Events: [
+    ["Education", "Career Development", "Networking", "Technology", "Business"],
+    ["Fun", "Arts", "Networking"],
+    ["Sports", "Fun", "Health"],
+    ["Social Impact", "Networking", "Leadership"],
+    ["Research", "Education", "Technology"],
+  ],
+};
+
+// Seeded random number generator for consistent mock data
+function seededRandom(seed: number) {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}
+
+function generateMockOpportunities(count: number): Opportunity[] {
+  const opportunities: Opportunity[] = [];
+
+  for (let i = 1; i <= count; i++) {
+    const seed = i * 12345;
+    const random = () => seededRandom(seed + opportunities.length);
+    
+    const category = categories[Math.floor(random() * categories.length)];
+    const locationData = cambodiaLocations[Math.floor(random() * cambodiaLocations.length)];
+    const isRemote = 'isRemote' in locationData && locationData.isRemote === true;
+    
+    const titlePrefix = titlePrefixes[Math.floor(random() * titlePrefixes.length)];
+    const titleSuffix = titleSuffixes[category][Math.floor(random() * titleSuffixes[category].length)];
+    const subcategoriesOptions = subcategoryMapping[category];
+    const selectedSubcategories = subcategoriesOptions[Math.floor(random() * subcategoriesOptions.length)];
+    const organization = organizations[Math.floor(random() * organizations.length)];
+    
+    // Add larger coordinate variance to spread markers within cities (approx 10-15km radius)
+    // Use different random calls for lat and lng to get varied positions
+    const latVariance = (seededRandom(seed + i * 7) - 0.5) * 0.15;
+    const lngVariance = (seededRandom(seed + i * 13) - 0.5) * 0.15;
+    
+    const verified = random() > 0.3;
+    const baseDate = new Date("2025-11-01");
+    const dateOffset = Math.floor(random() * 120);
+    const opportunityDate = new Date(baseDate);
+    opportunityDate.setDate(opportunityDate.getDate() + dateOffset);
+    
+    const deadlineOffset = Math.floor(random() * 30);
+    const deadlineDate = new Date(opportunityDate);
+    deadlineDate.setDate(deadlineDate.getDate() - deadlineOffset);
+    
+    const postedOffset = Math.floor(random() * 60);
+    const postedDate = new Date(baseDate);
+    postedDate.setDate(postedDate.getDate() - postedOffset);
+
+    const statuses: Opportunity["status"][] = ["Open", "Closed", "Full"];
+    const status = statuses[Math.floor(random() * 10) < 7 ? 0 : Math.floor(random() * 3)];
+
+    // Generate organization domain for contact/website
+    const orgDomain = organization.toLowerCase().replace(/\s+/g, "");
+
+    opportunities.push({
+      id: String(i),
+      title: `${titlePrefix} ${titleSuffix} ${Math.floor(random() * 100)}`,
+      organization,
+      category,
+      subcategory: selectedSubcategories[0],
+      subcategories: selectedSubcategories,
+      verified,
+      verifiedDate: verified ? postedDate.toISOString().split("T")[0] : undefined,
+      isPartnered: random() > 0.7,
+      location: locationData.name,
+      isRemote,
+      date: opportunityDate.toISOString().split("T")[0],
+      deadline: deadlineDate.toISOString().split("T")[0],
+      description: `This is a ${category.toLowerCase()} opportunity focused on ${selectedSubcategories.slice(0, 3).join(", ").toLowerCase()}. Join ${organization} for this exciting opportunity.`,
+      requirements: [
+        "Relevant experience or interest",
+        "Good communication skills",
+        "Ability to work in a team",
+      ],
+      benefits: [
+        "Gain valuable experience",
+        "Networking opportunities",
+        "Certificate of participation",
+      ],
+      status,
+      capacity: String(Math.floor(random() * 100) + 10),
+      postedDate: postedDate.toISOString().split("T")[0],
+      lastUpdated: postedDate.toISOString().split("T")[0],
+      contact: `contact@${orgDomain}.org`,
+      website: `https://${orgDomain}.org`,
+      coordinates: {
+        lat: locationData.lat + latVariance,
+        lng: locationData.lng + lngVariance,
+      },
+      views: Math.floor(random() * 2000) + 100,
+      applications: Math.floor(random() * 200) + 5,
+    });
+  }
+
+  return opportunities;
+}
+
+// Generate 1000 mock opportunities
+export const mockOpportunities: Opportunity[] = generateMockOpportunities(1000);
+
+// Export unique locations for filtering
+export const uniqueLocations = Array.from(new Set(mockOpportunities.map(opp => opp.location))).sort();
 
 export const mockSubmissions: Submission[] = [
   {

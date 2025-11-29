@@ -17,6 +17,9 @@ import { toast } from 'sonner';
 export function OpportunitySearch() {
   const [searchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(9); // default items per page
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedPosterTypes, setSelectedPosterTypes] = useState<string[]>([]);
@@ -25,7 +28,6 @@ export function OpportunitySearch() {
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>('relevance');
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
-  const [isFiltering, setIsFiltering] = useState(false);
 
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
   const subcategories = allSubcategories;
@@ -153,7 +155,6 @@ export function OpportunitySearch() {
     // Location type filter
     if (selectedLocationTypes.length > 0) {
       const isRemote = opportunity.isRemote;
-      const isInPerson = !opportunity.isRemote;
       if (selectedLocationTypes.includes('remote') && !selectedLocationTypes.includes('inperson') && !isRemote) return false;
       if (selectedLocationTypes.includes('inperson') && !selectedLocationTypes.includes('remote') && isRemote) return false;
     }
@@ -198,7 +199,25 @@ export function OpportunitySearch() {
     }
   });
 
-  const activeFiltersCount = selectedCategories.length + selectedSubcategories.length + selectedPosterTypes.length + 
+  // Pagination calculations
+  const totalResults = sortedOpportunities.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+
+  // Clamp current page when totalPages change
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages]);
+
+  // Reset to first page when filters/search/sort change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, JSON.stringify(selectedCategories), JSON.stringify(selectedSubcategories), JSON.stringify(selectedPosterTypes), JSON.stringify(selectedLocationTypes), dateRange, JSON.stringify(selectedProvinces), sortBy, pageSize]);
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalResults);
+  const paginatedOpportunities = sortedOpportunities.slice(startIndex, startIndex + pageSize);
+
+  const activeFiltersCount = selectedCategories.length + selectedSubcategories.length + selectedPosterTypes.length +
     selectedLocationTypes.length + (dateRange ? 1 : 0) + selectedProvinces.length;
 
   return (
@@ -215,8 +234,8 @@ export function OpportunitySearch() {
         <div className="mb-6">
           <div className="relative max-w-xl">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <Input 
-              placeholder="Search opportunities by title, organization, or location..." 
+            <Input
+              placeholder="Search opportunities by title, organization, or location..."
               className="pl-10 h-12 text-base"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -250,7 +269,7 @@ export function OpportunitySearch() {
                     <MapPin className="h-4 w-4" />
                     Filter by Location
                   </h4>
-                  <Select 
+                  <Select
                     value={selectedProvinces.length > 0 ? "selected" : ""}
                     onValueChange={() => {}}
                   >
@@ -261,7 +280,7 @@ export function OpportunitySearch() {
                       <div className="p-2 max-h-60 overflow-y-auto">
                         {cambodiaProvinces.map((province) => (
                           <div key={province} className="flex items-center gap-2 py-1">
-                            <Checkbox 
+                            <Checkbox
                               id={`province-${province}`}
                               checked={selectedProvinces.includes(province)}
                               onCheckedChange={(checked) => handleProvinceToggle(province, checked as boolean)}
@@ -277,7 +296,7 @@ export function OpportunitySearch() {
                   {selectedProvinces.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {selectedProvinces.map((province) => (
-                        <span 
+                        <span
                           key={province}
                           className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full cursor-pointer hover:bg-blue-200"
                           onClick={() => handleProvinceToggle(province, false)}
@@ -297,8 +316,8 @@ export function OpportunitySearch() {
                   <div className="space-y-2">
                     {categories.map((category) => (
                       <div key={category} className="flex items-center gap-2">
-                        <Checkbox 
-                          id={category} 
+                        <Checkbox
+                          id={category}
                           checked={selectedCategories.includes(category)}
                           onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
                         />
@@ -315,7 +334,7 @@ export function OpportunitySearch() {
                 {/* Subcategory Filter - Using dropdown for scalability */}
                 <div className="mb-6">
                   <h4 className="mb-3">Subcategory</h4>
-                  <Select 
+                  <Select
                     value={selectedSubcategories.length > 0 ? "selected" : ""}
                     onValueChange={() => {}}
                   >
@@ -326,7 +345,7 @@ export function OpportunitySearch() {
                       <div className="p-2 max-h-60 overflow-y-auto">
                         {subcategories.map((subcategory) => (
                           <div key={subcategory} className="flex items-center gap-2 py-1">
-                            <Checkbox 
+                            <Checkbox
                               id={`subcategory-${subcategory}`}
                               checked={selectedSubcategories.includes(subcategory)}
                               onCheckedChange={(checked) => handleSubcategoryToggle(subcategory, checked as boolean)}
@@ -342,7 +361,7 @@ export function OpportunitySearch() {
                   {selectedSubcategories.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
                       {selectedSubcategories.map((subcategory) => (
-                        <span 
+                        <span
                           key={subcategory}
                           className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full cursor-pointer hover:bg-green-200"
                           onClick={() => handleSubcategoryToggle(subcategory, false)}
@@ -361,8 +380,8 @@ export function OpportunitySearch() {
                   <h4 className="mb-3">Location Type</h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Checkbox 
-                        id="remote" 
+                      <Checkbox
+                        id="remote"
                         checked={selectedLocationTypes.includes('remote')}
                         onCheckedChange={(checked) => handleLocationTypeToggle('remote', checked as boolean)}
                       />
@@ -371,8 +390,8 @@ export function OpportunitySearch() {
                       </Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Checkbox 
-                        id="inperson" 
+                      <Checkbox
+                        id="inperson"
                         checked={selectedLocationTypes.includes('inperson')}
                         onCheckedChange={(checked) => handleLocationTypeToggle('inperson', checked as boolean)}
                       />
@@ -430,7 +449,7 @@ export function OpportunitySearch() {
                       </Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Checkbox 
+                      <Checkbox
                         id="partnered"
                         checked={selectedPosterTypes.includes('partnered')}
                         onCheckedChange={(checked) => {
@@ -455,11 +474,26 @@ export function OpportunitySearch() {
           <div className="flex-1">
             {/* Top Bar */}
             <div className="bg-white rounded-lg border p-4 mb-6 flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Showing <span className="text-gray-900 font-medium">{sortedOpportunities.length}</span> opportunities
-                {searchQuery && (
-                  <span className="ml-1">for "<span className="text-blue-600">{searchQuery}</span>"</span>
-                )}
+              <div className="text-sm text-gray-600 flex items-center gap-4">
+                <div>
+                  Showing <span className="text-gray-900 font-medium">{totalResults === 0 ? 0 : startIndex + 1}</span> - <span className="text-gray-900 font-medium">{endIndex}</span> of <span className="text-gray-900 font-medium">{totalResults}</span> opportunities
+                  {searchQuery && (
+                    <span className="ml-1">for "<span className="text-blue-600">{searchQuery}</span>"</span>
+                  )}
+                </div>
+                <div className="ml-2 flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Per page</span>
+                  <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="9">9</SelectItem>
+                      <SelectItem value="18">18</SelectItem>
+                      <SelectItem value="30">30</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="flex items-center gap-4">
@@ -495,7 +529,7 @@ export function OpportunitySearch() {
             </div>
 
             {/* Opportunity Grid */}
-            {sortedOpportunities.length === 0 ? (
+            {paginatedOpportunities.length === 0 ? (
               <div className="text-center py-16">
                 <Search className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-xl text-gray-700 mb-2">No opportunities found</h3>
@@ -506,24 +540,50 @@ export function OpportunitySearch() {
                 </Button>
               </div>
             ) : (
-              <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-6' : 'space-y-4'}>
-                {sortedOpportunities.map((opportunity) => (
-                  <OpportunityCard key={opportunity.id} opportunity={opportunity} />
-                ))}
+              <div>
+                <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-6' : 'space-y-4'}>
+                  {paginatedOpportunities.map((opportunity) => (
+                    <div key={opportunity.id}>
+                      <OpportunityCard opportunity={opportunity} />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
             {/* Pagination */}
             <div className="mt-8 flex items-center justify-center gap-2">
-              <Button variant="outline" disabled>
+              <Button variant="outline" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
                 Previous
               </Button>
-              <Button variant="outline" className="bg-blue-600 text-white">
-                1
-              </Button>
-              <Button variant="outline">2</Button>
-              <Button variant="outline">3</Button>
-              <Button variant="outline">
+
+              {/* dynamic page buttons (show up to 5 pages around current) */}
+              {(() => {
+                const pages: number[] = [];
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+                for (let p = startPage; p <= endPage; p++) pages.push(p);
+                return (
+                  <>
+                    {startPage > 1 && (
+                      <Button key={1} variant="ghost" onClick={() => setCurrentPage(1)}>1</Button>
+                    )}
+                    {startPage > 2 && <span className="px-2">…</span>}
+                    {pages.map((p) => (
+                      <Button key={p} variant={p === currentPage ? 'secondary' : 'outline'} onClick={() => setCurrentPage(p)}>
+                        {p}
+                      </Button>
+                    ))}
+                    {endPage < totalPages - 1 && <span className="px-2">…</span>}
+                    {endPage < totalPages && (
+                      <Button key={totalPages} variant="ghost" onClick={() => setCurrentPage(totalPages)}>{totalPages}</Button>
+                    )}
+                  </>
+                );
+              })()}
+
+              <Button variant="outline" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
                 Next
               </Button>
             </div>
