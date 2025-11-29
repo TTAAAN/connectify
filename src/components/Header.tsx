@@ -1,11 +1,10 @@
-import { Bell, Search, User, Shield, Clock, CheckCircle, X } from 'lucide-react';
+import { Bell, Search, Shield, Clock, CheckCircle, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
-import { Card, CardContent } from './ui/card';
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 
 interface HeaderProps {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Button } from '../components/ui/button';
@@ -10,8 +10,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon, LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
-  MapPin, Search, Layers, Locate, X,
-  ChevronLeft, ChevronRight, Calendar, ExternalLink
+  MapPin, Search, Layers, Locate,
+  ChevronLeft, ChevronRight, Calendar
 } from 'lucide-react';
 import { toast } from 'sonner';
 
