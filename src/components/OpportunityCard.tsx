@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
-import { MapPin, Calendar, Bookmark, CheckCircle, Clock, Building2, User } from 'lucide-react';
+import { MapPin, Calendar, Bookmark, Building2, User } from 'lucide-react';
 import { Opportunity } from '../lib/mockData';
 import { toast } from 'sonner';
 
