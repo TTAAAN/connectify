@@ -1,15 +1,19 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { MapPin, Calendar, Bookmark, CheckCircle, Clock, Building2, User } from 'lucide-react';
 import { Opportunity } from '../lib/mockData';
+import { toast } from 'sonner';
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
 }
 
 export function OpportunityCard({ opportunity }: OpportunityCardProps) {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  
   const categoryColors: Record<string, string> = {
     'Volunteering': 'bg-sky-100 text-sky-700',
     'Workshops': 'bg-blue-100 text-blue-700',
@@ -17,6 +21,22 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
     'Internships': 'bg-cyan-100 text-cyan-700',
     'Jobs': 'bg-blue-200 text-blue-800',
     'Events': 'bg-blue-50 text-blue-600'
+  };
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsBookmarked(!isBookmarked);
+    
+    if (!isBookmarked) {
+      toast.success('Opportunity saved!', {
+        description: `${opportunity.title} has been added to your saved items.`,
+      });
+    } else {
+      toast.info('Removed from saved', {
+        description: `${opportunity.title} has been removed from your saved items.`,
+      });
+    }
   };
 
   return (
@@ -64,8 +84,13 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             View Details
           </Button>
         </Link>
-        <Button variant="ghost" size="icon" className="h-10 w-10">
-          <Bookmark className="h-5 w-5" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`h-10 w-10 transition-colors ${isBookmarked ? 'text-blue-600 bg-blue-50' : ''}`}
+          onClick={handleBookmark}
+        >
+          <Bookmark className={`h-5 w-5 ${isBookmarked ? 'fill-current' : ''}`} />
         </Button>
       </CardFooter>
     </Card>

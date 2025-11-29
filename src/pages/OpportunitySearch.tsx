@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { OpportunityCard } from '../components/OpportunityCard';
@@ -9,23 +10,165 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Separator } from '../components/ui/separator';
 import { Switch } from '../components/ui/switch';
-import { mockOpportunities } from '../lib/mockData';
-import { Grid3x3, List, MapPin, RotateCcw } from 'lucide-react';
+import { mockOpportunities, Opportunity } from '../lib/mockData';
+import { Grid3x3, List, MapPin, RotateCcw, Search, Loader2 } from 'lucide-react';
+import { Input } from '../components/ui/input';
+import { toast } from 'sonner';
 
 export function OpportunitySearch() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPosterTypes, setSelectedPosterTypes] = useState<string[]>([]);
+  const [selectedLocationTypes, setSelectedLocationTypes] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('relevance');
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
+  const [showMapView, setShowMapView] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
-  
-  const filteredOpportunities = mockOpportunities.filter(opportunity => {
-    if (selectedPosterTypes.length > 0) {
-      if (selectedPosterTypes.includes('user') && opportunity.isPartnered) return false;
-      if (selectedPosterTypes.includes('partnered') && !opportunity.isPartnered) return false;
+  const locations = [
+    { value: 'all', label: 'All Locations' },
+    { value: 'sf', label: 'San Francisco, CA' },
+    { value: 'ny', label: 'New York, NY' },
+    { value: 'boston', label: 'Boston, MA' },
+    { value: 'seattle', label: 'Seattle, WA' },
+    { value: 'austin', label: 'Austin, TX' },
+    { value: 'miami', label: 'Miami, FL' },
+  ];
+
+  // Initialize search from URL params
+  useEffect(() => {
+    const search = searchParams.get('search');
+    if (search) {
+      setSearchQuery(search);
     }
+  }, [searchParams]);
+
+  const handleCategoryToggle = (category: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories([...selectedCategories, category]);
+    } else {
+      setSelectedCategories(selectedCategories.filter(c => c !== category));
+    }
+  };
+
+  const handleLocationTypeToggle = (type: string, checked: boolean) => {
+    if (checked) {
+      setSelectedLocationTypes([...selectedLocationTypes, type]);
+    } else {
+      setSelectedLocationTypes(selectedLocationTypes.filter(t => t !== type));
+    }
+  };
+
+  const resetFilters = () => {
+    setSelectedCategories([]);
+    setSelectedPosterTypes([]);
+    setSelectedLocationTypes([]);
+    setDateRange('');
+    setSelectedLocation('');
+    setSortBy('relevance');
+    setSearchQuery('');
+    toast.info('Filters reset', { description: 'All filters have been cleared.' });
+  };
+
+  const handleMapToggle = (checked: boolean) => {
+    setShowMapView(checked);
+    if (checked) {
+      navigate('/map');
+    }
+  };
+  
+  // Filter opportunities
+  const filteredOpportunities = mockOpportunities.filter(opportunity => {
+    // Search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = 
+        opportunity.title.toLowerCase().includes(query) ||
+        opportunity.organization.toLowerCase().includes(query) ||
+        opportunity.description.toLowerCase().includes(query) ||
+        opportunity.location.toLowerCase().includes(query);
+      if (!matchesSearch) return false;
+    }
+
+    // Category filter
+    if (selectedCategories.length > 0) {
+      if (!selectedCategories.includes(opportunity.category)) return false;
+    }
+
+    // Poster type filter
+    if (selectedPosterTypes.length > 0) {
+      if (selectedPosterTypes.includes('user') && !selectedPosterTypes.includes('partnered') && opportunity.isPartnered) return false;
+      if (selectedPosterTypes.includes('partnered') && !selectedPosterTypes.includes('user') && !opportunity.isPartnered) return false;
+    }
+
+    // Location type filter
+    if (selectedLocationTypes.length > 0) {
+      const isRemote = opportunity.isRemote;
+      const isInPerson = !opportunity.isRemote;
+      if (selectedLocationTypes.includes('remote') && !selectedLocationTypes.includes('inperson') && !isRemote) return false;
+      if (selectedLocationTypes.includes('inperson') && !selectedLocationTypes.includes('remote') && isRemote) return false;
+    }
+
+    // Location filter
+    if (selectedLocation && selectedLocation !== 'all') {
+      const locationMap: Record<string, string> = {
+        sf: 'San Francisco',
+        ny: 'New York',
+        boston: 'Boston',
+        seattle: 'Seattle',
+        austin: 'Austin',
+        miami: 'Miami',
+      };
+      if (!opportunity.location.includes(locationMap[selectedLocation])) return false;
+    }
+
+    // Date range filter
+    if (dateRange) {
+      const today = new Date();
+      const oppDate = new Date(opportunity.date);
+      
+      switch (dateRange) {
+        case 'today':
+          if (oppDate.toDateString() !== today.toDateString()) return false;
+          break;
+        case 'week':
+          const weekFromNow = new Date(today);
+          weekFromNow.setDate(weekFromNow.getDate() + 7);
+          if (oppDate > weekFromNow) return false;
+          break;
+        case 'month':
+          const monthFromNow = new Date(today);
+          monthFromNow.setMonth(monthFromNow.getMonth() + 1);
+          if (oppDate > monthFromNow) return false;
+          break;
+      }
+    }
+
     return true;
   });
+
+  // Sort opportunities
+  const sortedOpportunities = [...filteredOpportunities].sort((a, b) => {
+    switch (sortBy) {
+      case 'date':
+        return new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime();
+      case 'deadline':
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      case 'verified':
+        if (a.verified === b.verified) return 0;
+        return a.verified ? -1 : 1;
+      default:
+        return 0;
+    }
+  });
+
+  const activeFiltersCount = selectedCategories.length + selectedPosterTypes.length + 
+    selectedLocationTypes.length + (dateRange ? 1 : 0) + (selectedLocation && selectedLocation !== 'all' ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -37,14 +180,34 @@ export function OpportunitySearch() {
           <p className="text-gray-600">Find the perfect opportunity that matches your interests and goals</p>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input 
+              placeholder="Search opportunities by title, organization, or location..." 
+              className="pl-10 h-12 text-base"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="flex gap-6">
           {/* Left Sidebar - Filters */}
           <aside className="w-80 flex-shrink-0">
             <Card className="sticky top-24">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg">Filters</h3>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
+                  <h3 className="text-lg">
+                    Filters
+                    {activeFiltersCount > 0 && (
+                      <span className="ml-2 text-sm bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                        {activeFiltersCount}
+                      </span>
+                    )}
+                  </h3>
+                  <Button variant="ghost" size="sm" className="text-blue-600" onClick={resetFilters}>
                     <RotateCcw className="h-4 w-4 mr-1" />
                     Reset
                   </Button>
@@ -56,7 +219,11 @@ export function OpportunitySearch() {
                   <div className="space-y-2">
                     {categories.map((category) => (
                       <div key={category} className="flex items-center gap-2">
-                        <Checkbox id={category} />
+                        <Checkbox 
+                          id={category} 
+                          checked={selectedCategories.includes(category)}
+                          onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
+                        />
                         <Label htmlFor={category} className="cursor-pointer">
                           {category}
                         </Label>
@@ -72,13 +239,21 @@ export function OpportunitySearch() {
                   <h4 className="mb-3">Location Type</h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Checkbox id="remote" />
+                      <Checkbox 
+                        id="remote" 
+                        checked={selectedLocationTypes.includes('remote')}
+                        onCheckedChange={(checked) => handleLocationTypeToggle('remote', checked as boolean)}
+                      />
                       <Label htmlFor="remote" className="cursor-pointer">
                         Remote
                       </Label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Checkbox id="inperson" />
+                      <Checkbox 
+                        id="inperson" 
+                        checked={selectedLocationTypes.includes('inperson')}
+                        onCheckedChange={(checked) => handleLocationTypeToggle('inperson', checked as boolean)}
+                      />
                       <Label htmlFor="inperson" className="cursor-pointer">
                         In-Person
                       </Label>
@@ -97,7 +272,7 @@ export function OpportunitySearch() {
                 {/* Date Range */}
                 <div className="mb-6">
                   <h4 className="mb-3">Date Range</h4>
-                  <Select>
+                  <Select value={dateRange} onValueChange={setDateRange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select date range" />
                     </SelectTrigger>
@@ -105,7 +280,7 @@ export function OpportunitySearch() {
                       <SelectItem value="today">Today</SelectItem>
                       <SelectItem value="week">This Week</SelectItem>
                       <SelectItem value="month">This Month</SelectItem>
-                      <SelectItem value="custom">Custom Range</SelectItem>
+                      <SelectItem value="all">All Dates</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -115,20 +290,18 @@ export function OpportunitySearch() {
                 {/* Location */}
                 <div className="mb-6">
                   <h4 className="mb-3">Location</h4>
-                  <Select>
+                  <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select location" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Locations</SelectItem>
-                      <SelectItem value="sf">San Francisco, CA</SelectItem>
-                      <SelectItem value="ny">New York, NY</SelectItem>
-                      <SelectItem value="boston">Boston, MA</SelectItem>
-                      <SelectItem value="seattle">Seattle, WA</SelectItem>
+                      {locations.map((loc) => (
+                        <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <div className="flex items-center gap-2 mt-3">
-                    <Switch id="mapToggle" />
+                    <Switch id="mapToggle" checked={showMapView} onCheckedChange={handleMapToggle} />
                     <Label htmlFor="mapToggle" className="cursor-pointer text-sm">
                       Show map view
                     </Label>
@@ -142,7 +315,7 @@ export function OpportunitySearch() {
                   <h4 className="mb-3">Posted By</h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Checkbox 
+                      <Checkbox
                         id="user"
                         checked={selectedPosterTypes.includes('user')}
                         onCheckedChange={(checked) => {
@@ -211,11 +384,14 @@ export function OpportunitySearch() {
             {/* Top Bar */}
             <div className="bg-white rounded-lg border p-4 mb-6 flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Showing <span className="text-gray-900">{filteredOpportunities.length}</span> opportunities
+                Showing <span className="text-gray-900 font-medium">{sortedOpportunities.length}</span> opportunities
+                {searchQuery && (
+                  <span className="ml-1">for "<span className="text-blue-600">{searchQuery}</span>"</span>
+                )}
               </div>
 
               <div className="flex items-center gap-4">
-                <Select defaultValue="relevance">
+                <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
                   </SelectTrigger>
@@ -247,11 +423,23 @@ export function OpportunitySearch() {
             </div>
 
             {/* Opportunity Grid */}
-            <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-6' : 'space-y-4'}>
-              {filteredOpportunities.map((opportunity) => (
-                <OpportunityCard key={opportunity.id} opportunity={opportunity} />
-              ))}
-            </div>
+            {sortedOpportunities.length === 0 ? (
+              <div className="text-center py-16">
+                <Search className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                <h3 className="text-xl text-gray-700 mb-2">No opportunities found</h3>
+                <p className="text-gray-500 mb-4">Try adjusting your filters or search terms</p>
+                <Button onClick={resetFilters} variant="outline">
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Reset Filters
+                </Button>
+              </div>
+            ) : (
+              <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-6' : 'space-y-4'}>
+                {sortedOpportunities.map((opportunity) => (
+                  <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             <div className="mt-8 flex items-center justify-center gap-2">
