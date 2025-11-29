@@ -472,7 +472,9 @@ export function OpportunityDetail() {
             <h2 className="text-3xl mb-6">Similar Opportunities</h2>
             <div className="grid grid-cols-3 gap-6">
               {similarOpportunities.map((opp) => (
-                <OpportunityCard key={opp.id} opportunity={opp} />
+                <div key={opp.id}>
+                  <OpportunityCard opportunity={opp} />
+                </div>
               ))}
             </div>
           </div>
