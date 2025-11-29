@@ -244,6 +244,7 @@ export function EventSubmission() {
                         <SelectValue placeholder="Select a subcategory" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
                         <SelectItem value="fun">Fun</SelectItem>
                         <SelectItem value="technology">Technology</SelectItem>
                         <SelectItem value="education">Education</SelectItem>
