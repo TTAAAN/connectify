@@ -163,6 +163,11 @@ export function MapView() {
     const today = new Date();
     
     return mockOpportunities.filter(opp => {
+      // Filter out unverified/pending opportunities - only show verified ones
+      if (!opp.verified) {
+        return false;
+      }
+
       // Hide expired opportunities (past deadline)
       if (hideExpired && isDeadlinePassed(opp.deadline)) {
         return false;
