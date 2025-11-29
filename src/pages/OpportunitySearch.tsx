@@ -9,7 +9,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Separator } from '../components/ui/separator';
-import { mockOpportunities } from '../lib/mockData';
+import { mockOpportunities, allSubcategories } from '../lib/mockData';
 import { Grid3x3, List, MapPin, RotateCcw, Search } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { toast } from 'sonner';
@@ -28,7 +28,7 @@ export function OpportunitySearch() {
   const [isFiltering, setIsFiltering] = useState(false);
 
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
-  const subcategories = ['Fun', 'Technology', 'Education', 'ETC'];
+  const subcategories = allSubcategories;
   
   // Cambodia provinces for location filter
   const cambodiaProvinces = [
@@ -137,9 +137,11 @@ export function OpportunitySearch() {
       if (!selectedCategories.includes(opportunity.category)) return false;
     }
 
-    // Subcategory filter (filters by the subcategory field)
+    // Subcategory filter (filters by subcategory field or subcategories array)
     if (selectedSubcategories.length > 0) {
-      if (!opportunity.subcategory || !selectedSubcategories.includes(opportunity.subcategory)) return false;
+      const oppSubcategories = opportunity.subcategories || (opportunity.subcategory ? [opportunity.subcategory] : []);
+      const hasMatchingSubcategory = selectedSubcategories.some(sub => oppSubcategories.includes(sub));
+      if (!hasMatchingSubcategory) return false;
     }
 
     // Poster type filter
