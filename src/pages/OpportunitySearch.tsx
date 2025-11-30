@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
@@ -10,7 +10,7 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Separator } from '../components/ui/separator';
 import { mockOpportunities, allSubcategories } from '../lib/mockData';
-import { Grid3x3, List, MapPin, RotateCcw, Search } from 'lucide-react';
+import { Grid3x3, List, MapPin, RotateCcw, Search, AlertCircle } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { toast } from 'sonner';
 
@@ -28,6 +28,21 @@ export function OpportunitySearch() {
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>('relevance');
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
+  const [hideExpired, setHideExpired] = useState<boolean>(true);
+  const [feeFilter, setFeeFilter] = useState<string>('all'); // 'all', 'free', 'paid'
+
+  // Filter out unverified/pending opportunities - only show verified ones
+  const verifiedOpportunities = useMemo(() => {
+    return mockOpportunities.filter(opp => opp.verified);
+  }, []);
+
+  // Check if deadline has passed
+  const isDeadlinePassed = (deadline: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadlineDate = new Date(deadline);
+    return deadlineDate < today;
+  };
 
   const categories = ['Volunteering', 'Workshops', 'Competitions', 'Internships', 'Jobs', 'Events'];
   const subcategories = allSubcategories;
@@ -110,11 +125,26 @@ export function OpportunitySearch() {
     setSelectedProvinces([]);
     setSortBy('relevance');
     setSearchQuery('');
+    setHideExpired(true);
+    setFeeFilter('all');
     toast.info('Filters reset', { description: 'All filters have been cleared.' });
   };
   
-  // Filter opportunities
-  const filteredOpportunities = mockOpportunities.filter(opportunity => {
+  // Filter opportunities (starting from verified opportunities only)
+  const filteredOpportunities = verifiedOpportunities.filter(opportunity => {
+    // Hide expired opportunities (past deadline)
+    if (hideExpired && isDeadlinePassed(opportunity.deadline)) {
+      return false;
+    }
+    
+    // Fee filter
+    if (feeFilter === 'free' && opportunity.fee !== 0) {
+      return false;
+    }
+    if (feeFilter === 'paid' && opportunity.fee === 0) {
+      return false;
+    }
+    
     // Search query filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -211,14 +241,14 @@ export function OpportunitySearch() {
   // Reset to first page when filters/search/sort change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, JSON.stringify(selectedCategories), JSON.stringify(selectedSubcategories), JSON.stringify(selectedPosterTypes), JSON.stringify(selectedLocationTypes), dateRange, JSON.stringify(selectedProvinces), sortBy, pageSize]);
+  }, [searchQuery, JSON.stringify(selectedCategories), JSON.stringify(selectedSubcategories), JSON.stringify(selectedPosterTypes), JSON.stringify(selectedLocationTypes), dateRange, JSON.stringify(selectedProvinces), sortBy, pageSize, hideExpired]);
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalResults);
   const paginatedOpportunities = sortedOpportunities.slice(startIndex, startIndex + pageSize);
 
   const activeFiltersCount = selectedCategories.length + selectedSubcategories.length + selectedPosterTypes.length +
-    selectedLocationTypes.length + (dateRange ? 1 : 0) + selectedProvinces.length;
+    selectedLocationTypes.length + (dateRange ? 1 : 0) + selectedProvinces.length + (hideExpired ? 0 : 1);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -262,6 +292,23 @@ export function OpportunitySearch() {
                     Reset
                   </Button>
                 </div>
+
+                {/* Hide Expired Toggle */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-6">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-gray-500" />
+                    <Label htmlFor="hide-expired" className="cursor-pointer text-sm">
+                      Hide expired deadlines
+                    </Label>
+                  </div>
+                  <Checkbox 
+                    id="hide-expired"
+                    checked={hideExpired}
+                    onCheckedChange={(checked) => setHideExpired(checked as boolean)}
+                  />
+                </div>
+
+                <Separator className="my-6" />
 
                 {/* Filter by Location - Cambodia Provinces (moved to top) */}
                 <div className="mb-6">
@@ -406,6 +453,23 @@ export function OpportunitySearch() {
                       </Label>
                     </div>
                   </div>
+                </div>
+
+                <Separator className="my-6" />
+
+                {/* Fee Filter */}
+                <div className="mb-6">
+                  <h4 className="mb-3">Fee to Join</h4>
+                  <Select value={feeFilter} onValueChange={setFeeFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fee type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All (Free & Paid)</SelectItem>
+                      <SelectItem value="free">Free Only</SelectItem>
+                      <SelectItem value="paid">Paid Only</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Separator className="my-6" />

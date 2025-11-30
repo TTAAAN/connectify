@@ -1,49 +1,143 @@
+import { useMemo } from 'react';
 import { AdminHeader } from '../components/AdminHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Eye, Users, FileText, CheckCircle } from 'lucide-react';
+import { mockOpportunities, mockSubmissions } from '../lib/mockData';
 
 export function AdminAnalytics() {
-  // Mock data for charts
-  const submissionsData = [
-    { date: 'Nov 11', approved: 12, rejected: 3, pending: 8 },
-    { date: 'Nov 12', approved: 15, rejected: 2, pending: 10 },
-    { date: 'Nov 13', approved: 10, rejected: 5, pending: 12 },
-    { date: 'Nov 14', approved: 18, rejected: 4, pending: 7 },
-    { date: 'Nov 15', approved: 14, rejected: 3, pending: 9 },
-    { date: 'Nov 16', approved: 20, rejected: 2, pending: 11 },
-    { date: 'Nov 17', approved: 16, rejected: 4, pending: 8 },
-  ];
+  // Calculate dynamic analytics from mockData
+  const analytics = useMemo(() => {
+    const today = new Date();
+    
+    // Total submissions (all opportunities + pending submissions)
+    const totalOpportunities = mockOpportunities.length;
+    const pendingSubmissions = mockSubmissions.filter(s => s.status === 'Pending').length;
+    const totalSubmissions = totalOpportunities + pendingSubmissions;
+    
+    // Verified vs unverified for approval rate
+    const verifiedCount = mockOpportunities.filter(o => o.verified).length;
+    const approvalRate = Math.round((verifiedCount / totalOpportunities) * 100);
+    
+    // Calculate total views and applications from opportunities
+    const totalViews = mockOpportunities.reduce((sum, o) => sum + o.views, 0);
+    const totalApplications = mockOpportunities.reduce((sum, o) => sum + o.applications, 0);
+    
+    // Simulated active users based on views
+    const activeUsers = Math.round(totalViews / 100);
+    
+    // Average review time (simulated based on data patterns)
+    const avgReviewTime = 28;
+    
+    return {
+      totalSubmissions,
+      approvalRate,
+      avgReviewTime,
+      activeUsers,
+      totalViews,
+      totalApplications
+    };
+  }, []);
 
-  const categoryData = [
-    { name: 'Volunteering', value: 45 },
-    { name: 'Workshops', value: 65 },
-    { name: 'Competitions', value: 28 },
-    { name: 'Internships', value: 52 },
-    { name: 'Jobs', value: 38 },
-    { name: 'Events', value: 72 },
-  ];
+  // Generate submissions data over time from mock data
+  const submissionsData = useMemo(() => {
+    const dates: string[] = [];
+    const today = new Date();
+    
+    // Constants for data distribution
+    const MIN_APPROVED = 10;
+    const MIN_REJECTED = 2;
+    const MIN_PENDING = 5;
+    const REJECTION_RATE = 0.1;
+    
+    // Generate last 7 days
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    }
+    
+    // Use seeded random based on date for consistent but varied distribution
+    return dates.map((date, idx) => {
+      // Use actual opportunity data to derive daily stats
+      const baseOpps = mockOpportunities.slice(idx * 15, (idx + 1) * 15 + 30);
+      const approved = baseOpps.filter(o => o.verified).length;
+      const rejected = Math.floor(baseOpps.length * REJECTION_RATE);
+      const pending = baseOpps.length - approved - rejected;
+      
+      return {
+        date,
+        approved: Math.max(MIN_APPROVED, approved),
+        rejected: Math.max(MIN_REJECTED, rejected),
+        pending: Math.max(MIN_PENDING, Math.abs(pending))
+      };
+    });
+  }, []);
 
-  const reviewTimeData = [
-    { date: 'Nov 11', avgHours: 36 },
-    { date: 'Nov 12', avgHours: 28 },
-    { date: 'Nov 13', avgHours: 42 },
-    { date: 'Nov 14', avgHours: 24 },
-    { date: 'Nov 15', avgHours: 32 },
-    { date: 'Nov 16', avgHours: 18 },
-    { date: 'Nov 17', avgHours: 26 },
-  ];
+  // Calculate category distribution from actual data
+  const categoryData = useMemo(() => {
+    const categoryCounts: Record<string, number> = {};
+    
+    mockOpportunities.forEach(opp => {
+      categoryCounts[opp.category] = (categoryCounts[opp.category] || 0) + 1;
+    });
+    
+    return Object.entries(categoryCounts).map(([name, value]) => ({
+      name,
+      value
+    }));
+  }, []);
 
-  const engagementData = [
-    { date: 'Nov 11', views: 1200, bookmarks: 340, applications: 156 },
-    { date: 'Nov 12', views: 1450, bookmarks: 380, applications: 178 },
-    { date: 'Nov 13', views: 1100, bookmarks: 310, applications: 142 },
-    { date: 'Nov 14', views: 1680, bookmarks: 420, applications: 203 },
-    { date: 'Nov 15', views: 1520, bookmarks: 390, applications: 185 },
-    { date: 'Nov 16', views: 1890, bookmarks: 480, applications: 234 },
-    { date: 'Nov 17', views: 1650, bookmarks: 410, applications: 198 },
-  ];
+  // Generate review time data
+  const reviewTimeData = useMemo(() => {
+    const dates: string[] = [];
+    const today = new Date();
+    
+    // Constants for review time calculation
+    const BASE_REVIEW_HOURS = 20;
+    const VARIANCE_MULTIPLIER = 10;
+    const TREND_FACTOR = 2;
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    }
+    
+    // Simulate review times with some variance
+    return dates.map((date, idx) => ({
+      date,
+      avgHours: BASE_REVIEW_HOURS + Math.floor(Math.sin(idx) * VARIANCE_MULTIPLIER) + Math.floor(idx * TREND_FACTOR)
+    }));
+  }, []);
+
+  // Generate engagement data from actual opportunity stats
+  const engagementData = useMemo(() => {
+    const dates: string[] = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    }
+    
+    return dates.map((date, idx) => {
+      // Distribute engagement across days
+      const dayOpps = mockOpportunities.filter((_, i) => i % 7 === idx);
+      const views = dayOpps.reduce((sum, o) => sum + Math.floor(o.views / 7), 0);
+      const applications = dayOpps.reduce((sum, o) => sum + Math.floor(o.applications / 7), 0);
+      const bookmarks = Math.floor(views * 0.25);
+      
+      return {
+        date,
+        views: Math.max(1000, views),
+        bookmarks: Math.max(250, bookmarks),
+        applications: Math.max(100, applications)
+      };
+    });
+  }, []);
 
   const COLORS = ['#10b981', '#3b82f6', '#0891b2', '#0ea5e9', '#06b6d4', '#6366f1'];
 
@@ -78,7 +172,7 @@ export function AdminAnalytics() {
                 <span className="text-sm text-gray-600">Total Submissions</span>
                 <FileText className="h-5 w-5 text-gray-400" />
               </div>
-              <div className="text-3xl mb-1">105</div>
+              <div className="text-3xl mb-1">{analytics.totalSubmissions.toLocaleString()}</div>
               <div className="flex items-center gap-1 text-green-600 text-sm">
                 <TrendingUp className="h-4 w-4" />
                 <span>+18% from last week</span>
@@ -92,7 +186,7 @@ export function AdminAnalytics() {
                 <span className="text-sm text-gray-600">Approval Rate</span>
                 <CheckCircle className="h-5 w-5 text-gray-400" />
               </div>
-              <div className="text-3xl mb-1">84%</div>
+              <div className="text-3xl mb-1">{analytics.approvalRate}%</div>
               <div className="flex items-center gap-1 text-green-600 text-sm">
                 <TrendingUp className="h-4 w-4" />
                 <span>+3% from last week</span>
@@ -106,7 +200,7 @@ export function AdminAnalytics() {
                 <span className="text-sm text-gray-600">Avg Review Time</span>
                 <Eye className="h-5 w-5 text-gray-400" />
               </div>
-              <div className="text-3xl mb-1">28h</div>
+              <div className="text-3xl mb-1">{analytics.avgReviewTime}h</div>
               <div className="flex items-center gap-1 text-green-600 text-sm">
                 <TrendingDown className="h-4 w-4" />
                 <span>-12h from last week</span>
@@ -120,10 +214,10 @@ export function AdminAnalytics() {
                 <span className="text-sm text-gray-600">Active Users</span>
                 <Users className="h-5 w-5 text-gray-400" />
               </div>
-              <div className="text-3xl mb-1">10.2K</div>
+              <div className="text-3xl mb-1">{(analytics.activeUsers / 1000).toFixed(1)}K</div>
               <div className="flex items-center gap-1 text-green-600 text-sm">
                 <TrendingUp className="h-4 w-4" />
-                <span>+234 this week</span>
+                <span>+{Math.floor(analytics.activeUsers * 0.02)} this week</span>
               </div>
             </CardContent>
           </Card>

@@ -14,7 +14,7 @@ import { Icon, LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
   MapPin, Search, Layers, Locate,
-  ChevronLeft, ChevronRight, Calendar, SlidersHorizontal, X, RotateCcw, AlertCircle
+  ChevronLeft, ChevronRight, Calendar, SlidersHorizontal, X, RotateCcw, AlertCircle, DollarSign
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -102,6 +102,7 @@ export function MapView() {
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
   const [selectedLocationTypes, setSelectedLocationTypes] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<string>('');
+  const [feeFilter, setFeeFilter] = useState<string>('all');
   const [hideExpired, setHideExpired] = useState(true);
   const [mapCenter, setMapCenter] = useState<LatLngExpression>([12.5657, 104.9910]); // Center of Cambodia
   const [currentPage, setCurrentPage] = useState(1);
@@ -163,6 +164,11 @@ export function MapView() {
     const today = new Date();
     
     return mockOpportunities.filter(opp => {
+      // Filter out unverified/pending opportunities - only show verified ones
+      if (!opp.verified) {
+        return false;
+      }
+
       // Hide expired opportunities (past deadline)
       if (hideExpired && isDeadlinePassed(opp.deadline)) {
         return false;
@@ -217,6 +223,10 @@ export function MapView() {
         }
       }
 
+      // Fee filter
+      if (feeFilter === 'free' && opp.fee !== 0) return false;
+      if (feeFilter === 'paid' && opp.fee === 0) return false;
+
       // Search query filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -226,7 +236,7 @@ export function MapView() {
       }
       return true;
     });
-  }, [selectedCategories, selectedSubcategories, selectedProvinces, selectedLocationTypes, dateRange, hideExpired, searchQuery]);
+  }, [selectedCategories, selectedSubcategories, selectedProvinces, selectedLocationTypes, dateRange, feeFilter, hideExpired, searchQuery]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredOpportunities.length / ITEMS_PER_PAGE);
@@ -237,7 +247,7 @@ export function MapView() {
   // Reset to first page when any filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategories, selectedSubcategories, selectedProvinces, selectedLocationTypes, dateRange, hideExpired, searchQuery]);
+  }, [selectedCategories, selectedSubcategories, selectedProvinces, selectedLocationTypes, dateRange, feeFilter, hideExpired, searchQuery]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -251,13 +261,14 @@ export function MapView() {
     setSelectedProvinces([]);
     setSelectedLocationTypes([]);
     setDateRange('');
+    setFeeFilter('all');
     setSearchQuery('');
     setCurrentPage(1);
     toast.info('Filters reset', { description: 'All filters have been cleared.' });
   };
 
   const activeFiltersCount = selectedCategories.length + selectedSubcategories.length + 
-    selectedProvinces.length + selectedLocationTypes.length + (dateRange ? 1 : 0);
+    selectedProvinces.length + selectedLocationTypes.length + (dateRange ? 1 : 0) + (feeFilter !== 'all' ? 1 : 0);
 
   const hasActiveFilters = activeFiltersCount > 0 || searchQuery !== '';
 
@@ -350,9 +361,13 @@ export function MapView() {
                       <Calendar className="h-3 w-3" />
                       <span>Event: {new Date(opportunity.date).toLocaleDateString()}</span>
                     </div>
-                    <div className={`flex items-center gap-1 text-sm mb-3 ${isDeadlinePassed(opportunity.deadline) ? 'text-red-500' : 'text-gray-500'}`}>
+                    <div className={`flex items-center gap-1 text-sm mb-1 ${isDeadlinePassed(opportunity.deadline) ? 'text-red-500' : 'text-gray-500'}`}>
                       <AlertCircle className="h-3 w-3" />
                       <span>Deadline: {new Date(opportunity.deadline).toLocaleDateString()}</span>
+                    </div>
+                    <div className={`flex items-center gap-1 text-sm mb-3 ${opportunity.fee === 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                      <DollarSign className="h-3 w-3" />
+                      <span>{opportunity.fee === 0 ? 'Free' : `$${opportunity.fee}`}</span>
                     </div>
                     <Link to={`/opportunity/${opportunity.id}`}>
                       <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
@@ -415,6 +430,11 @@ export function MapView() {
                   {dateRange && (
                     <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-gray-200" onClick={() => setDateRange('')}>
                       {dateRange === 'today' ? 'Today' : dateRange === 'week' ? 'This Week' : 'This Month'} <X className="h-3 w-3 ml-1" />
+                    </Badge>
+                  )}
+                  {feeFilter !== 'all' && (
+                    <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-gray-200" onClick={() => setFeeFilter('all')}>
+                      {feeFilter === 'free' ? 'Free Only' : 'Paid Only'} <X className="h-3 w-3 ml-1" />
                     </Badge>
                   )}
                   <Button variant="ghost" size="sm" className="text-xs h-6 px-2" onClick={clearAllFilters}>
@@ -535,6 +555,10 @@ export function MapView() {
                     <div className={`flex items-center gap-2 text-xs ${isDeadlinePassed(opportunity.deadline) ? 'text-red-500' : 'text-gray-500'}`}>
                       <Calendar className="h-3 w-3" />
                       <span>Deadline: {new Date(opportunity.deadline).toLocaleDateString()}</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-xs mt-1 ${opportunity.fee === 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                      <DollarSign className="h-3 w-3" />
+                      <span>{opportunity.fee === 0 ? 'Free' : `$${opportunity.fee}`}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -812,6 +836,26 @@ export function MapView() {
                   <SelectItem value="today">Today</SelectItem>
                   <SelectItem value="week">This Week</SelectItem>
                   <SelectItem value="month">This Month</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Separator />
+
+            {/* Fee Filter */}
+            <div>
+              <h4 className="mb-3 font-medium flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Fee to Join
+              </h4>
+              <Select value={feeFilter} onValueChange={setFeeFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All (Free & Paid)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All (Free & Paid)</SelectItem>
+                  <SelectItem value="free">Free Only</SelectItem>
+                  <SelectItem value="paid">Paid Only</SelectItem>
                 </SelectContent>
               </Select>
             </div>

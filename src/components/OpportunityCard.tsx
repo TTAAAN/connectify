@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
-import { MapPin, Calendar, Bookmark, Building2, User } from 'lucide-react';
+import { MapPin, Calendar, Bookmark, Building2, User, DollarSign } from 'lucide-react';
 import { Opportunity } from '../lib/mockData';
 import { toast } from 'sonner';
 
@@ -94,6 +94,12 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             <span>{new Date(opportunity.date).toLocaleDateString()}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            <span className={opportunity.fee === 0 ? 'text-green-600 font-medium' : ''}>
+              {opportunity.fee === 0 ? 'Free' : `$${opportunity.fee}`}
+            </span>
           </div>
         </div>
         <p className="mt-3 text-gray-700 line-clamp-2">
