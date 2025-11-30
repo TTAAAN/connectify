@@ -255,7 +255,7 @@ export function EventSubmission() {
                 <div className="space-y-6">
                   <h2 className="text-2xl mb-4">Basic Information</h2>
                   
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="title">Opportunity Title *</Label>
                     <Input 
                       id="title" 
@@ -265,7 +265,7 @@ export function EventSubmission() {
                     />
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="category">Category *</Label>
                     <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
                       <SelectTrigger>
@@ -282,7 +282,7 @@ export function EventSubmission() {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label>Subcategories (Optional - Select multiple)</Label>
                     <Select
                       value={selectedSubcategories.length > 0 ? "selected" : ""}
@@ -324,7 +324,7 @@ export function EventSubmission() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="organization">Organization Name *</Label>
                     <Input 
                       id="organization" 
@@ -334,7 +334,7 @@ export function EventSubmission() {
                     />
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="organizationWebsite">Organization Website</Label>
                     <Input 
                       id="organizationWebsite" 
@@ -345,7 +345,7 @@ export function EventSubmission() {
                     />
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="shortDescription">Short Description * (Max 200 characters)</Label>
                     <Textarea 
                       id="shortDescription" 
@@ -367,7 +367,7 @@ export function EventSubmission() {
                 <div className="space-y-6">
                   <h2 className="text-2xl mb-4">Detailed Information</h2>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="fullDescription">Full Description *</Label>
                     <Textarea 
                       id="fullDescription" 
@@ -378,7 +378,7 @@ export function EventSubmission() {
                     />
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="requirements">Requirements</Label>
                     <Textarea 
                       id="requirements" 
@@ -389,7 +389,7 @@ export function EventSubmission() {
                     />
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="benefits">Benefits</Label>
                     <Textarea 
                       id="benefits" 
@@ -401,7 +401,7 @@ export function EventSubmission() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="capacity">Capacity</Label>
                       <Input 
                         id="capacity" 
@@ -411,7 +411,7 @@ export function EventSubmission() {
                       />
                     </div>
 
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="fee">Fee to Join (USD)</Label>
                       <Input 
                         id="fee" 
@@ -426,7 +426,7 @@ export function EventSubmission() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="targetAudience">Target Audience</Label>
                       <Input 
                         id="targetAudience" 
@@ -444,7 +444,7 @@ export function EventSubmission() {
                 <div className="space-y-6">
                   <h2 className="text-2xl mb-4">Location & Date Information</h2>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="eventType">Event Type *</Label>
                     <Select value={formData.eventType} onValueChange={(value) => setFormData({...formData, eventType: value})}>
                       <SelectTrigger>
@@ -459,7 +459,7 @@ export function EventSubmission() {
                   </div>
 
                   {(formData.eventType === 'inperson' || formData.eventType === 'hybrid') && (
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="address">Address *</Label>
                       <Input 
                         id="address" 
@@ -474,7 +474,7 @@ export function EventSubmission() {
                   )}
 
                   {(formData.eventType === 'remote' || formData.eventType === 'hybrid') && (
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="virtualLink">Virtual Meeting Link</Label>
                       <Input 
                         id="virtualLink" 
@@ -524,7 +524,7 @@ export function EventSubmission() {
                           )}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
+                          <div className="space-y-2">
                             <Label htmlFor={`startDate-${eventDate.id}`}>Start Date & Time *</Label>
                             <Input 
                               id={`startDate-${eventDate.id}`}
@@ -533,7 +533,7 @@ export function EventSubmission() {
                               onChange={(e) => updateEventDate(eventDate.id, 'startDate', e.target.value)}
                             />
                           </div>
-                          <div>
+                          <div className="space-y-2">
                             <Label htmlFor={`endDate-${eventDate.id}`}>End Date & Time</Label>
                             <Input 
                               id={`endDate-${eventDate.id}`}
@@ -547,7 +547,7 @@ export function EventSubmission() {
                     ))}
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="deadline">Application Deadline *</Label>
                     <Input 
                       id="deadline" 
