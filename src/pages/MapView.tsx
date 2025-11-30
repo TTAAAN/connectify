@@ -474,26 +474,6 @@ export function MapView() {
               <Locate className="h-5 w-5" />
             </Button>
           </div>
-
-          {/* Legend - positioned in bottom right with proper spacing */}
-          <div className="absolute bottom-4 right-4 z-[1000] pointer-events-auto">
-            <Card className="w-48 bg-white/95 backdrop-blur-sm shadow-lg">
-              <CardContent className="pt-3 pb-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <Layers className="h-4 w-4" />
-                  <span className="text-sm font-medium">Legend</span>
-                </div>
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
-                  {Object.entries(categoryColors).map(([category, color]) => (
-                    <div key={category} className="flex items-center gap-1">
-                      <div className={`w-2 h-2 rounded-full ${color} flex-shrink-0`}></div>
-                      <span className="truncate">{category}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
         {/* Left Slide-out Panel */}
