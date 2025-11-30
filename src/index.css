@@ -121,6 +121,7 @@
     --color-gray-900: oklch(.21 .034 264.665);
     --color-black: #000;
     --color-white: #fff;
+    --color-orange: oklch(.75 .19 83.5);
     --spacing: .25rem;
     --container-md: 28rem;
     --container-lg: 32rem;
@@ -1488,6 +1489,10 @@
     background-color: #00000080;
   }
 
+  .bg-black {
+    background-color: var(--color-black);
+  }
+
   @supports (color: color-mix(in lab, red, red)) {
     .bg-black\/50 {
       background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
@@ -1518,6 +1523,8 @@
     background-color: var(--color-blue-600);
   }
 
+
+
   .bg-border {
     background-color: var(--border);
   }
@@ -1540,6 +1547,10 @@
 
   .bg-cyan-600 {
     background-color: var(--color-cyan-600);
+  }
+
+  .bg-orange {
+    background-color: var(--color-orange);
   }
 
   .bg-destructive {

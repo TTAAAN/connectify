@@ -115,9 +115,9 @@ export function MapView() {
       'Volunteering': 'bg-sky-500',
       'Workshops': 'bg-green-500',
       'Competitions': 'bg-indigo-500',
-      'Internships': 'bg-blue-500',
+      'Internships': 'bg-orange',
       'Jobs': 'bg-red-500',
-      'Events': 'bg-cyan-500',
+      'Events': 'bg-black',
     };
 
   const handleCategoryToggle = (category: string, checked: boolean) => {
