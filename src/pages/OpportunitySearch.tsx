@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { OpportunityCard } from '../components/OpportunityCard';
@@ -10,7 +10,7 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Separator } from '../components/ui/separator';
 import { mockOpportunities, allSubcategories } from '../lib/mockData';
-import { Grid3x3, List, MapPin, RotateCcw, Search, AlertCircle } from 'lucide-react';
+import { Grid3x3, List, MapPin, RotateCcw, Search, AlertCircle, PlusCircle } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { toast } from 'sonner';
 
@@ -650,6 +650,18 @@ export function OpportunitySearch() {
               <Button variant="outline" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
                 Next
               </Button>
+            </div>
+
+            {/* Contribute Call-to-Action */}
+            <div className="mt-10 text-center py-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Know of an opportunity?</h3>
+              <p className="text-gray-600 mb-4">Help others discover amazing opportunities by sharing one with the community.</p>
+              <Link to="/submit">
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Submit an Opportunity
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
