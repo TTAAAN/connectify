@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -52,13 +52,13 @@ export function SignUp() {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     toast.success('Account created successfully!', {
-      description: 'Welcome to Connectify! Redirecting to your dashboard...',
+      description: 'Welcome to Connectify! Redirecting to onboarding...',
     });
     
     setIsLoading(false);
     
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate('/onboarding');
     }, 1000);
   };
 
@@ -66,11 +66,11 @@ export function SignUp() {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     toast.success(`Signed up with ${provider}!`, {
-      description: 'Welcome to Connectify! Redirecting to your dashboard...',
+      description: 'Welcome to Connectify! Redirecting to onboarding...',
     });
     setIsLoading(false);
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate('/onboarding');
     }, 1000);
   };
 
